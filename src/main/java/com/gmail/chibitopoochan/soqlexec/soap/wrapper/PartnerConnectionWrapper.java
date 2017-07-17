@@ -1,3 +1,4 @@
+package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
 import com.sforce.soap.partner.LoginResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;

@@ -1,3 +1,4 @@
+package com.gmail.chibitopoochan.soqlexec.util;
 /**
  * システム全般で使用する定数を定義
  */

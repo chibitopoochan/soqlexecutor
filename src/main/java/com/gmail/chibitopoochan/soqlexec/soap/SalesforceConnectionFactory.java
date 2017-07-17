@@ -1,8 +1,11 @@
+package com.gmail.chibitopoochan.soqlexec.soap;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
