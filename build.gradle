@@ -10,6 +10,15 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
+// Define the default encoding
+def defaultEncoding = 'UTF-8'
+tasks.withType(AbstractCompile)*.options*.encoding = defaultEncoding
+tasks.withType(GroovyCompile)*.groovyOptions*.encoding = defaultEncoding
+
+// Define the default encoding for Javadoc
+javadoc {
+    options.encoding = "UTF-8"
+}
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.

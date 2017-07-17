@@ -23,7 +23,7 @@ public class PartnerConnectionWrapper {
 	}
 
 	/**
-	 * {@see com.sforce.soap.partner.PartnerConnection#login(String, String)}のラップ.
+	 * {@link com.sforce.soap.partner.PartnerConnection#login(String, String)}のラップ.
 	 * 詳細は呼び出し先のAPIを参照のこと
 	 * @param username
 	 * @param password
@@ -35,7 +35,7 @@ public class PartnerConnectionWrapper {
 	}
 
 	/**
-	 * {@see com.sforce.soap.partner.PartnerConnection#logout()}のラップ
+	 * {@link com.sforce.soap.partner.PartnerConnection#logout()}のラップ
 	 * 詳細は呼び出し先のAPIを参照のこと
 	 * @throws ConnectionException
 	 */

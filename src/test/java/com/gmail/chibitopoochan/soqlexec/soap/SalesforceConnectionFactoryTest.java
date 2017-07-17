@@ -30,9 +30,9 @@ public class SalesforceConnectionFactoryTest {
     	mock = new PartnerConnectionWrapperMock();
 
     	// Login情報を設定
-    	String url = "url";
-    	String username = "name";
-    	String password = "pwd";
+    	url = "url";
+    	username = "name";
+    	password = "pwd";
 
     	// Loginを実行
     	factory = new SalesforceConnectionFactory(url, username, password);

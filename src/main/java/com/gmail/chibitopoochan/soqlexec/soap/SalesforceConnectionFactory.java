@@ -35,6 +35,10 @@ public class SalesforceConnectionFactory {
         config = new ConnectorConfig();
         config.setAuthEndpoint(authEndPoint);
         config.setManualLogin(true);
+
+        this.username = username;
+        this.password = password;
+
 	}
 
 	/**
