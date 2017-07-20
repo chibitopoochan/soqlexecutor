@@ -13,11 +13,14 @@ import com.sforce.ws.ConnectorConfig;
 /**
  * Salesforceへの接続を提供.
  * SalesforceへのI/Fを提供するコネクタを生成します。
+ * 接続情報を初期化時に決定するため、変更する場合は別のインスタンスを作成してください。
  */
 public class SalesforceConnectionFactory {
+	// クラス共通の参照
 	private static final Logger logger = LoggerFactory.getLogger(SalesforceConnectionFactory.class);
-	private static final ResourceBundle resources = ResourceBundle.getBundle("Message");
+	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.MESSAGE_RESOURCE.getValue());
 
+	// ログイン関連の情報
 	private PartnerConnectionWrapper connection;
 	private LoginResult loginResult;
 	private ConnectorConfig config;
@@ -42,11 +45,19 @@ public class SalesforceConnectionFactory {
 	}
 
 	/**
-	 * SalesforceAPIのラッパーを取得
+	 * SalesforceAPIのラッパーを設定
 	 * @param wrapper SalesforceAPIのラッパー
 	 */
 	public void setConnectionWrapper(PartnerConnectionWrapper wrapper) {
 		this.connection = wrapper;
+	}
+
+	/**
+	 * SalesforceAPIのラッパーを取得
+	 * @return SalesforceAPIのラッパー
+	 */
+	public PartnerConnectionWrapper getConnectionWrapper() {
+		return connection;
 	}
 
 	/**
@@ -66,12 +77,12 @@ public class SalesforceConnectionFactory {
 			logger.info(resources.getString(Constants.MSG_001.getValue()));
 
 		} catch (ConnectionException e) {
-			e.printStackTrace();
-			logger.warn(
+			logger.error(
 					 resources.getString(Constants.ERR_001.getValue())
 					,username
 					,password
-					,config.getAuthEndpoint());
+					,config.getAuthEndpoint()
+					,e);
 
 		}
 
@@ -98,12 +109,20 @@ public class SalesforceConnectionFactory {
 			loginResult = null;
 
 		} catch (ConnectionException e) {
-			e.printStackTrace();
-			logger.warn(resources.getString(Constants.ERR_002.getValue()));
+			loginResult = null;
+			logger.error(resources.getString(Constants.ERR_002.getValue()), e);
 
 		}
 
 		return isSuccess;
+	}
+
+	/**
+	 * ログイン状態の取得
+	 * @return ログインならtrue
+	 */
+	public boolean isLogin() {
+		return loginResult != null;
 	}
 
 }

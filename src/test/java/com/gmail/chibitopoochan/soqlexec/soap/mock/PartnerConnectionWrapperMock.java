@@ -1,5 +1,7 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
@@ -10,6 +12,24 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	private String username;
 	private String password;
 	private String url;
+	private DescribeGlobalResultWrapper globalResult;
+	private DescribeSObjectResultWrapper fieldResult;
+
+	/**
+	 *
+	 * @param wrapper
+	 */
+	public void setDescribeSObjectResultWrapper(DescribeSObjectResultWrapper wrapper) {
+		this.fieldResult = wrapper;
+	}
+
+	/**
+	 *
+	 * @param wrapper
+	 */
+	public void setDescribeGlobalResultWrapper(DescribeGlobalResultWrapper wrapper) {
+		this.globalResult = wrapper;
+	}
 
 	/**
 	 *
@@ -68,6 +88,30 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	@Override
 	public void logout() throws ConnectionException {
 		if(!success) {
+			throw new ConnectionException();
+		}
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#describeGlobal()
+	 */
+	@Override
+	public DescribeGlobalResultWrapper describeGlobal() throws ConnectionException {
+		if(success) {
+			return globalResult;
+		} else {
+			throw new ConnectionException();
+		}
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#describeSObject(java.lang.String)
+	 */
+	@Override
+	public DescribeSObjectResultWrapper describeSObject(String name) throws ConnectionException {
+		if(success) {
+			return fieldResult;
+		} else {
 			throw new ConnectionException();
 		}
 	}

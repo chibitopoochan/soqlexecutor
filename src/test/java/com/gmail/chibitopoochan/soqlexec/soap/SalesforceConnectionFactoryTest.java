@@ -40,6 +40,10 @@ public class SalesforceConnectionFactoryTest {
 
 	}
 
+	@Test public void testSetterGetter() {
+		assertThat(factory.getConnectionWrapper(), is(mock));
+	}
+
 	/**
      * ログイン成功のケース
      */
@@ -50,6 +54,7 @@ public class SalesforceConnectionFactoryTest {
     	assertThat(mock.getUrl(), is(url));
     	assertThat(mock.getUsername(), is(username));
     	assertThat(mock.getPassword(), is(password));
+    	assertThat(factory.isLogin(), is(true));
 
     }
 
@@ -59,6 +64,7 @@ public class SalesforceConnectionFactoryTest {
     @Test public void testLoginFailed() {
     	mock.setSuccess(false);
     	assertFalse(factory.login());
+    	assertThat(factory.isLogin(), is(false));
 
     }
 

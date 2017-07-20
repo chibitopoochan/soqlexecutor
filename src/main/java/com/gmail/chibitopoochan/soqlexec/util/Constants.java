@@ -8,6 +8,8 @@ public enum Constants {
 	,ERR_002("ERR.002")
 	,MSG_001("MSG.001")
 	,MSG_002("MSG.002")
+	,MSG_003("MSG.003")
+	,MSG_004("MSG.004")
 	;
 
 	/** リソース名 */
