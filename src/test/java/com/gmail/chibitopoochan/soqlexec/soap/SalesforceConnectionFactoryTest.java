@@ -40,6 +40,9 @@ public class SalesforceConnectionFactoryTest {
 
 	}
 
+	/**
+	 * Getter/Setter検証のケース
+	 */
 	@Test public void testSetterGetter() {
 		assertThat(factory.getConnectionWrapper(), is(mock));
 	}
