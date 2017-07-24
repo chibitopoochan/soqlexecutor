@@ -25,7 +25,7 @@ import com.sforce.ws.ConnectionException;
 public class MetaInformationProvider {
 	// クラス共通の参照
 	private static final Logger logger = LoggerFactory.getLogger(MetaInformationProvider.class);
-	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.MESSAGE_RESOURCE.getValue());
+	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
 	private PartnerConnectionWrapper connection;
 
@@ -111,7 +111,7 @@ public class MetaInformationProvider {
 	private static DescribeGlobalSObjectResultWrapper loggingSObject(DescribeGlobalSObjectResultWrapper metaInfo) {
 		if(logger.isDebugEnabled()) {
 			logger.debug(
-					resources.getString(Constants.MSG_003.getValue())
+					resources.getString(Constants.Message.Information.MSG_003)
 					,metaInfo.getName()
 					,metaInfo.getLabel()
 					,metaInfo.getKeyPrefix());
@@ -129,7 +129,7 @@ public class MetaInformationProvider {
 	private static FieldsWrapper loggingField(FieldsWrapper metaInfo) {
 		if(logger.isDebugEnabled()) {
 			logger.debug(
-					resources.getString(Constants.MSG_004.getValue())
+					resources.getString(Constants.Message.Information.MSG_004)
 					,metaInfo.getName()
 					,metaInfo.getLabel()
 					,metaInfo.getLength()

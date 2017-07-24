@@ -18,7 +18,7 @@ import com.sforce.ws.ConnectorConfig;
 public class SalesforceConnectionFactory {
 	// クラス共通の参照
 	private static final Logger logger = LoggerFactory.getLogger(SalesforceConnectionFactory.class);
-	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.MESSAGE_RESOURCE.getValue());
+	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
 	// ログイン関連の情報
 	private PartnerConnectionWrapper connection;
@@ -74,11 +74,11 @@ public class SalesforceConnectionFactory {
 			isSuccess = true;
 
 			// ログ出力
-			logger.info(resources.getString(Constants.MSG_001.getValue()));
+			logger.info(resources.getString(Constants.Message.Information.MSG_001));
 
 		} catch (ConnectionException e) {
 			logger.error(
-					 resources.getString(Constants.ERR_001.getValue())
+					 resources.getString(Constants.Message.Error.ERR_001)
 					,username
 					,password
 					,config.getAuthEndpoint()
@@ -102,7 +102,7 @@ public class SalesforceConnectionFactory {
 			isSuccess = true;
 
 			// ログ出力
-			logger.info(resources.getString(Constants.MSG_002.getValue()));
+			logger.info(resources.getString(Constants.Message.Error.ERR_002));
 
 			// 変数の初期化
 			connection = null;
@@ -110,7 +110,7 @@ public class SalesforceConnectionFactory {
 
 		} catch (ConnectionException e) {
 			loginResult = null;
-			logger.error(resources.getString(Constants.ERR_002.getValue()), e);
+			logger.error(resources.getString(Constants.Message.Error.ERR_002), e);
 
 		}
 
