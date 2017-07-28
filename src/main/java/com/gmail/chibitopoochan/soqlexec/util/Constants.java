@@ -3,6 +3,10 @@ package com.gmail.chibitopoochan.soqlexec.util;
  * システム全般で使用する定数を定義
  */
 public class Constants {
+
+	/**
+	 *  ユーザやログに表示するメッセージ
+	 */
 	public class Message {
 		public static final String RESOURCE = "Message";
 
@@ -10,6 +14,7 @@ public class Constants {
 			public static final String ERR_001 = "ERR.001";
 			public static final String ERR_002 = "ERR.002";
 			public static final String ERR_003 = "ERR.003";
+			public static final String ERR_004 = "ERR.004";
 		}
 
 		public class Information {
@@ -22,13 +27,16 @@ public class Constants {
 
 	}
 
+	/**
+	 * SOQLに関連する定数
+	 */
 	public class SOQL {
 		public static final String FIELD_SEPARATE_SIGN = ",";
-		public static final String FIELD_RELATION_SIGN = ".";
+		public static final String FIELD_RELATION_SIGN = "\\.";
 		public static final String SUBQUERY_LEFT_SIGN = "(";
 
 		public class Pattern {
-			public static final String SELECT_FIELDS = "select\\s+(.+)\\s+from.+";
+			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,]+)\\s+from.+";
 		}
 	}
 

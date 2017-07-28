@@ -1,8 +1,12 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
 import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -14,6 +18,10 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	private String url;
 	private DescribeGlobalResultWrapper globalResult;
 	private DescribeSObjectResultWrapper fieldResult;
+	private int queryOption;
+	private Map<String, QueryResultWrapper> resultMap = new HashMap<>();
+	private Map<String, QueryResultWrapper> resultAllMap = new HashMap<>();
+	private Map<String, QueryResultWrapper> resultMoreMap = new HashMap<>();
 
 	/**
 	 *
@@ -58,6 +66,33 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 */
 	public String getUrl() {
 		return url;
+	}
+
+	/**
+	 *
+	 * @param soql
+	 * @param result
+	 */
+	public void putSOQL(String soql, QueryResultWrapper result) {
+		resultMap.put(soql, result);
+	}
+
+	/**
+	 *
+	 * @param soql
+	 * @param result
+	 */
+	public void putSOQLAll(String soql, QueryResultWrapper result) {
+		resultAllMap.put(soql, result);
+	}
+
+	/**
+	 *
+	 * @param queryLocation
+	 * @param result
+	 */
+	public void putSOQLMore(String queryLocation, QueryResultWrapper result) {
+		resultMoreMap.put(queryLocation, result);
 	}
 
 	/* (非 Javadoc)
@@ -111,6 +146,58 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	public DescribeSObjectResultWrapper describeSObject(String name) throws ConnectionException {
 		if(success) {
 			return fieldResult;
+		} else {
+			throw new ConnectionException();
+		}
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#setQueryOption(int)
+	 */
+	@Override
+	public void setQueryOption(int batchSize) {
+		queryOption = batchSize;
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#getQueryOption()
+	 */
+	@Override
+	public int getQueryOption() {
+		return queryOption;
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#query(java.lang.String)
+	 */
+	@Override
+	public QueryResultWrapper query(String soql) throws ConnectionException {
+		if(success) {
+			return resultMap.get(soql);
+		} else {
+			throw new ConnectionException();
+		}
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#queryAll(java.lang.String)
+	 */
+	@Override
+	public QueryResultWrapper queryAll(String soql) throws ConnectionException {
+		if(success) {
+			return resultAllMap.get(soql);
+		} else {
+			throw new ConnectionException();
+		}
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#queryMore(java.lang.String)
+	 */
+	@Override
+	public QueryResultWrapper queryMore(String queryLocator) throws ConnectionException {
+		if(success) {
+			return resultMoreMap.get(queryLocator);
 		} else {
 			throw new ConnectionException();
 		}

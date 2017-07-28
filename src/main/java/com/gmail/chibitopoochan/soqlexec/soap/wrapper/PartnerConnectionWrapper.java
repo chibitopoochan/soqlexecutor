@@ -62,4 +62,51 @@ public class PartnerConnectionWrapper {
 		return new DescribeSObjectResultWrapper(connection.describeSObject(name));
 	}
 
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#setQueryOptions(int)}のラップ
+	 * @param batchSize 取得件数
+	 */
+	public void setQueryOption(int batchSize) {
+		connection.setQueryOptions(batchSize);
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#getQueryOptions()}のラップ
+	 * バッチサイズ取得のため、内部でgetBatchSize()を呼び出している。
+	 * @return 取得件数
+	 */
+	public int getQueryOption() {
+		return connection.getQueryOptions().getBatchSize();
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#query(String)}}
+	 * @param soql SOQL
+	 * @return 実行結果
+	 * @throws ConnectionException 接続エラー
+	 */
+	public QueryResultWrapper query(String soql) throws ConnectionException {
+		return new QueryResultWrapper(connection.query(soql));
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#queryAll(String)}のラップ
+	 * @param soql SOQL
+	 * @return 実行結果
+	 * @throws ConnectionException 接続エラー
+	 */
+	public QueryResultWrapper queryAll(String soql) throws ConnectionException {
+		return new QueryResultWrapper(connection.queryAll(soql));
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#queryMore(String)}のラップ
+	 * @param queryLocator クエリ位置
+	 * @return 実行結果
+	 * @throws ConnectionException 接続エラー
+	 */
+	public QueryResultWrapper queryMore(String queryLocator) throws ConnectionException {
+		return new QueryResultWrapper(connection.queryMore(queryLocator));
+	}
+
 }
