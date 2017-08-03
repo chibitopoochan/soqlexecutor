@@ -15,6 +15,10 @@ public class Constants {
 			public static final String ERR_002 = "ERR.002";
 			public static final String ERR_003 = "ERR.003";
 			public static final String ERR_004 = "ERR.004";
+			public static final String ERR_005 = "ERR.005";
+			public static final String ERR_006 = "ERR.006";
+			public static final String ERR_007 = "ERR.007";
+			public static final String ERR_008 = "ERR.008";
 		}
 
 		public class Information {
@@ -23,6 +27,51 @@ public class Constants {
 			public static final String MSG_003 = "MSG.003";
 			public static final String MSG_004 = "MSG.004";
 			public static final String MSG_005 = "MSG.005";
+			public static final String MSG_006 = "MSG.006";
+			public static final String MSG_007 = "MSG.007";
+			public static final String MSG_008 = "MSG.008";
+			public static final String MSG_009 = "MSG.009";
+		}
+
+	}
+
+	public class Properties {
+		public static final String RESOURCE = "Properties";
+
+		public class UserInterface {
+			public static final String AUTH_END_POINT = "authEndPoint";
+		}
+	}
+
+	/**
+	 * ユーザインタフェースで使用する引数、コマンド
+	 */
+	public class UserInterface {
+		/**
+		 * 対話形式のコマンド
+		 */
+		public class Command {
+			public static final String QUIT = "quit";
+			public static final String SET = "set";
+		}
+
+		/**
+		 * コマンド形式のパラメータ
+		 */
+		public class Parameter {
+			public static final String PREFIX 	= "-";
+			public static final String ID		= PREFIX + "id";
+			public static final String PWD		= PREFIX + "pwd";
+			public static final String QUERY	= PREFIX + "query";
+			public static final String ENV		= PREFIX + "env";
+			public static final String SET		= PREFIX + "set";
+
+			public class Option {
+				public static final String ALL = "all";
+				public static final String MORE = "more";
+				public static final String DELIMITA = ";";
+				public static final String SIGN = "=";
+			}
 		}
 
 	}

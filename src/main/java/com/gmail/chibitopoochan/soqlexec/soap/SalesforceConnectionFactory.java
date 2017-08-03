@@ -4,9 +4,9 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
-import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
@@ -22,7 +22,7 @@ public class SalesforceConnectionFactory {
 
 	// ログイン関連の情報
 	private PartnerConnectionWrapper connection;
-	private LoginResult loginResult;
+	private LoginResultWrapper loginResult;
 	private ConnectorConfig config;
 	private String username;
 	private String password;
@@ -37,6 +37,7 @@ public class SalesforceConnectionFactory {
 		connection = new PartnerConnectionWrapper();
         config = new ConnectorConfig();
         config.setAuthEndpoint(authEndPoint);
+        config.setServiceEndpoint(authEndPoint);
         config.setManualLogin(true);
 
         this.username = username;
@@ -53,11 +54,29 @@ public class SalesforceConnectionFactory {
 	}
 
 	/**
-	 * SalesforceAPIのラッパーを取得
+	 * SalesforceAPIのラッパーを取得.
+	 * 取得時に都度接続を生成
 	 * @return SalesforceAPIのラッパー
 	 */
 	public PartnerConnectionWrapper getConnectionWrapper() {
-		return connection;
+		// 接続設定を再作成
+        ConnectorConfig config = new ConnectorConfig();
+        config.setAuthEndpoint(loginResult.getServerUrl());
+        config.setServiceEndpoint(loginResult.getServerUrl());
+        config.setManualLogin(true);
+        config.setSessionId(loginResult.getSessionId());
+
+        // 接続を再作成
+        try {
+			connection.createNewInstance(config);
+			logger.info(resources.getString(Constants.Message.Information.MSG_006),loginResult.getServerUrl(), loginResult.getSessionId());
+		} catch (ConnectionException e) {
+			logger.error(resources.getString(Constants.Message.Error.ERR_005),loginResult.getServerUrl(), loginResult.getSessionId(), e);
+			logger.error(e.toString(), e);
+		}
+
+        return connection;
+
 	}
 
 	/**
@@ -74,15 +93,16 @@ public class SalesforceConnectionFactory {
 			isSuccess = true;
 
 			// ログ出力
-			logger.info(resources.getString(Constants.Message.Information.MSG_001));
+			logger.info(resources.getString(Constants.Message.Information.MSG_001), username, password, config.getAuthEndpoint());
 
 		} catch (ConnectionException e) {
+			loginResult = null;
 			logger.error(
 					 resources.getString(Constants.Message.Error.ERR_001)
 					,username
 					,password
-					,config.getAuthEndpoint()
-					,e);
+					,config.getAuthEndpoint());
+			logger.error(e.toString(), e);
 
 		}
 
@@ -98,11 +118,11 @@ public class SalesforceConnectionFactory {
 
 		try {
 			// ログアウト
-			connection.logout();
+			getConnectionWrapper().logout();
 			isSuccess = true;
 
 			// ログ出力
-			logger.info(resources.getString(Constants.Message.Error.ERR_002));
+			logger.info(resources.getString(Constants.Message.Information.MSG_002));
 
 			// 変数の初期化
 			connection = null;
@@ -110,6 +130,7 @@ public class SalesforceConnectionFactory {
 
 		} catch (ConnectionException e) {
 			loginResult = null;
+			logger.error(e.toString());
 			logger.error(resources.getString(Constants.Message.Error.ERR_002), e);
 
 		}
@@ -123,6 +144,10 @@ public class SalesforceConnectionFactory {
 	 */
 	public boolean isLogin() {
 		return loginResult != null;
+	}
+
+	public void setLoginResult(LoginResultWrapper result) {
+		this.loginResult = result;
 	}
 
 }

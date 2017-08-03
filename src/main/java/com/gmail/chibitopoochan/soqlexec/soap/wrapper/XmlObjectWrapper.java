@@ -1,5 +1,9 @@
 package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.sforce.ws.bind.XmlObject;
 
 /**
@@ -44,8 +48,34 @@ public class XmlObjectWrapper {
 	 * @param name 項目名
 	 * @return 値
 	 */
-	public String getField(String name) {
-		return (String) result.getField(name);
+	public Object getField(String name) {
+		return result.getField(name);
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.sobject.SObject#getChildren()}をラップ
+	 * @return 子要素一覧
+	 */
+	public Iterator<XmlObjectWrapper> getChildren() {
+		List<XmlObjectWrapper> children = new LinkedList<>();
+		result.getChildren().forEachRemaining(c -> children.add(new XmlObjectWrapper(c)));
+		return children.iterator();
+	}
+
+	/**
+	 * {@link com.sforce.soap.partner.sobject.SObject#getValue()}をラップ
+	 * @return 値
+	 */
+	public Object getValue() {
+		return result.getValue();
+	}
+
+	/**
+	 * {@link com.sforce.ws.bind.XmlObject#getName()}をラップ
+	 * @return 名前
+	 */
+	public QNameWrapper getName() {
+		return new QNameWrapper(result.getName());
 	}
 
 }

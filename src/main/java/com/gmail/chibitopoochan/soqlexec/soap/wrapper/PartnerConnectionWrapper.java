@@ -1,5 +1,4 @@
 package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
-import com.sforce.soap.partner.LoginResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -30,8 +29,8 @@ public class PartnerConnectionWrapper {
 	 * @return ログイン結果
 	 * @throws ConnectionException 接続エラー
 	 */
-	public LoginResult login(String username, String password) throws ConnectionException {
-		return connection.login(username, password);
+	public LoginResultWrapper login(String username, String password) throws ConnectionException {
+		return new LoginResultWrapper(connection.login(username, password));
 	}
 
 	/**

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.gmail.chibitopoochan.soqlexec.soap.mock.LoginResultWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PartnerConnectionWrapperMock;
 
 /**
@@ -34,9 +35,15 @@ public class SalesforceConnectionFactoryTest {
     	username = "name";
     	password = "pwd";
 
+    	// 実行結果を設定
+    	LoginResultWrapperMock result = new LoginResultWrapperMock();
+    	result.setServerUrl(url);
+    	result.setSessionId("sessionId");
+
     	// Loginを実行
     	factory = new SalesforceConnectionFactory(url, username, password);
     	factory.setConnectionWrapper(mock);
+    	factory.setLoginResult(result);
 
 	}
 

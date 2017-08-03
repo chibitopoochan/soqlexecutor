@@ -2,6 +2,7 @@ package com.gmail.chibitopoochan.soqlexec.soap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PartnerConnectionWrapperMock;
+import com.gmail.chibitopoochan.soqlexec.soap.mock.QNameWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.QueryResultWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SObjectWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.XmlObjectWrapperMock;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -22,10 +25,10 @@ import com.sforce.ws.ConnectionException;
  */
 public class SOQLExecutorTest {
 	// 検証に使用するSOQL
-	public static final String SOQL_NORMAL = "SELECT NAME FROM USER";
-	public static final String SOQL_ALL = "select name from user";
-	public static final String SOQL_MORE = "Select Name From User ";
-	public static final String SOQL_REF = "select name.child1.child2.child3 from User";
+	public static final String SOQL_NORMAL = "SELECT namE FROM USER";
+	public static final String SOQL_ALL = "select naMe from user";
+	public static final String SOQL_MORE = "Select nAme From User ";
+	public static final String SOQL_REF = "select child1.child2.child3.NamE from User";
 
 	// 検証に使用するインスタンス
 	private PartnerConnectionWrapperMock connection;
@@ -50,12 +53,6 @@ public class SOQLExecutorTest {
 		connection = new PartnerConnectionWrapperMock();
 		executor = new SOQLExecutor(connection);
 
-		// 各初期化を実行
-		setNormalRecords();
-		setMoreRecords();
-		setAllRecords();
-		setRefRecords();
-
 	}
 
 	/**
@@ -65,7 +62,7 @@ public class SOQLExecutorTest {
 		// レコードの作成
 		normalRecords = new SObjectWrapperMock[1];
 		normalRecords[0] = new SObjectWrapperMock();
-		normalRecords[0].putField("NAME", "value");
+		normalRecords[0].addChild(createColumn("name", "value"));
 
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
@@ -82,20 +79,20 @@ public class SOQLExecutorTest {
 	private void setRefRecords() {
 		// 参照先レコードの作成
 		XmlObjectWrapperMock child3 = new XmlObjectWrapperMock();
-		child3.putField("name", "value");
+		child3.addChild(createColumn("name", "value"));
 
 		// 参照先（中間）レコードの作成
 		XmlObjectWrapperMock child2 = new XmlObjectWrapperMock();
-		child2.putChild("child3", child3);
+		child2.addChild(createColumn("child3", child3));
 
 		// 参照先（中間）レコードの作成
 		XmlObjectWrapperMock child1 = new XmlObjectWrapperMock();
-		child1.putChild("child2", child2);
+		child1.addChild(createColumn("child2", child2));
 
 		// レコードの作成
 		refRecords = new SObjectWrapperMock[1];
 		refRecords[0] = new SObjectWrapperMock();
-		refRecords[0].putChild("child1", child1);
+		refRecords[0].addChild(createColumn("child1", child1));
 
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
@@ -113,7 +110,7 @@ public class SOQLExecutorTest {
 		// 通常レコードの作成
 		normalRecords = new SObjectWrapperMock[1];
 		normalRecords[0] = new SObjectWrapperMock();
-		normalRecords[0].putField("Name", "value1");
+		normalRecords[0].addChild(createColumn("name", "value1"));
 
 		// クエリ結果の作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
@@ -124,7 +121,7 @@ public class SOQLExecutorTest {
 		// 追加レコードの作成
 		moreRecords = new SObjectWrapperMock[1];
 		moreRecords[0] = new SObjectWrapperMock();
-		moreRecords[0].putField("Name", "value2");
+		moreRecords[0].addChild(createColumn("name", "value2"));
 
 		// クエリ結果の作成
 		QueryResultWrapperMock moreResult = new QueryResultWrapperMock();
@@ -145,7 +142,7 @@ public class SOQLExecutorTest {
 		// 削除レコードの作成
 		allRecords = new SObjectWrapperMock[1];
 		allRecords[0] = new SObjectWrapperMock();
-		allRecords[0].putField("name", "value");
+		allRecords[0].addChild(createColumn("name", "value"));
 
 		// クエリ結果の作成
 		QueryResultWrapperMock allResult = new QueryResultWrapperMock();
@@ -157,6 +154,37 @@ public class SOQLExecutorTest {
 	}
 
 	/**
+	 * キーと値から列情報を作成.
+	 * @param key キー項目
+	 * @param value 値
+	 * @return 列情報
+	 */
+	private XmlObjectWrapper createColumn(String key, String value) {
+		QNameWrapperMock name = new QNameWrapperMock();
+		name.setLocalPart(key);
+
+		XmlObjectWrapperMock column = new XmlObjectWrapperMock();
+		column.setName(name);
+		column.setValue(value);
+
+		return column;
+	}
+
+	/**
+	 * キーと参照先から列情報を作成.
+	 * @param key キー項目
+	 * @param ref 参照先
+	 * @return 列情報
+	 */
+	private XmlObjectWrapper createColumn(String key, XmlObjectWrapperMock ref) {
+		QNameWrapperMock name = new QNameWrapperMock();
+		name.setLocalPart(key);
+		ref.setName(name);
+
+		return ref;
+	}
+
+	/**
 	 * 以下のパラメータで参照項目あり
 	 * Size:変更
 	 * More:false
@@ -164,6 +192,9 @@ public class SOQLExecutorTest {
 	 * @throws ConnectionException
 	 */
 	@Test public void testExecSOQL() throws ConnectionException {
+		// 個別の初期化処理
+		setNormalRecords();
+
 		// 接続設定
 		connection.setSuccess(true);
 
@@ -182,7 +213,7 @@ public class SOQLExecutorTest {
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 
 		// 項目の値を取得できること
-		assertThat(records.get(0).get("name1"), is(normalRecords[0].getField("name1")));
+		assertThat(records.get(0).get("namE"), is((String)normalRecords[0].getField("name")));
 
 	}
 
@@ -194,6 +225,9 @@ public class SOQLExecutorTest {
 	 * @throws ConnectionException
 	 */
 	@Test public void testExecSOQLWithAll() throws ConnectionException {
+		// 個別の初期化処理
+		setAllRecords();
+
 		// 接続設定
 		connection.setSuccess(true);
 
@@ -209,7 +243,7 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
-		assertThat(records.get(0).get("name3"), is(normalRecords[0].getField("name3")));
+		assertThat(records.get(0).get("naMe"), is(allRecords[0].getField("name")));
 	}
 
 	/**
@@ -220,6 +254,9 @@ public class SOQLExecutorTest {
 	 * @throws ConnectionException
 	 */
 	@Test public void testExecSOQLWithMore() throws ConnectionException {
+		// 個別の初期化処理
+		setMoreRecords();
+
 		// 接続設定
 		connection.setSuccess(true);
 
@@ -235,8 +272,8 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(2)));
-		assertThat(records.get(0).get("name"), is(normalRecords[0].getField("name")));
-		assertThat(records.get(1).get("name"), is(moreRecords[0].getField("name")));
+		assertThat(records.get(0).get("nAme"), is(normalRecords[0].getField("name")));
+		assertThat(records.get(1).get("nAme"), is(moreRecords[0].getField("name")));
 	}
 
 	/**
@@ -247,6 +284,9 @@ public class SOQLExecutorTest {
 	 * @throws ConnectionException
 	 */
 	@Test public void testExecSOQLWithRef() throws ConnectionException {
+		// 個別の初期化処理
+		setRefRecords();
+
 		// 接続設定
 		connection.setSuccess(true);
 
@@ -262,7 +302,12 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
-		assertThat(records.get(0).get("name.child1.child2.child3"), is(normalRecords[0].getField("name.child1.child2.child3")));
+		assertNotNull(refRecords[0].getChild("child1"));
+		assertNotNull(refRecords[0].getChild("child1").getChild("child2"));
+		assertNotNull(refRecords[0].getChild("child1").getChild("child2").getChild("child3"));
+		assertThat(records.get(0).get("child1.child2.child3.NamE"),
+				is(refRecords[0].getChild("child1").getChild("child2").getChild("child3").getField("name")));
+
 	}
 
 	/**
@@ -273,6 +318,9 @@ public class SOQLExecutorTest {
 	 * @throws ConnectionException
 	 */
 	@Test public void testExecSOQLFailed() throws ConnectionException {
+		// 個別の初期化処理
+		setNormalRecords();
+
 		// 接続設定
 		connection.setSuccess(false);
 

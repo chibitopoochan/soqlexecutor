@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
-import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
@@ -107,11 +107,11 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see PartnerConnectionWrapper#login(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public LoginResult login(String username, String password) throws ConnectionException {
+	public LoginResultWrapper login(String username, String password) throws ConnectionException {
 		this.username = username;
 		this.password = password;
 		if(success) {
-			return new LoginResult();
+			return new LoginResultWrapper();
 		} else {
 			throw new ConnectionException();
 		}

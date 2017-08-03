@@ -2,8 +2,11 @@ package com.gmail.chibitopoochan.soqlexec.soap;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +87,6 @@ public class SOQLExecutor {
 	/**
 	 * SOQLの実行
 	 * @param soql 実行するSOQL
-	 * @param batchSize バッチサイズ（nullならデフォルト値）
 	 * @return レコード一覧
 	 * @throws ConnectionException 接続エラー
 	 */
@@ -108,7 +110,7 @@ public class SOQLExecutor {
 			selectField = match.group(1);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
-			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{0}", soql));
+			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
 		}
 
 		// サブクエリは対象外（解析が複雑になるので）
@@ -118,12 +120,16 @@ public class SOQLExecutor {
 		}
 
 		// 項目に分割
-		String[] fields = selectField.split(Constants.SOQL.FIELD_SEPARATE_SIGN);
+		List<String> fields = Arrays
+				.stream(selectField.split(Constants.SOQL.FIELD_SEPARATE_SIGN))
+				.map(f -> f.trim())
+				.collect(Collectors.toList());
 
 		// レコードを取得
 		List<Map<String, String>> fieldList = Arrays.stream(result.getRecords())
 				.map(r -> toMapRecord(fields, r))
 				.collect(Collectors.toList());
+		logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
 
 		// さらに取得する場合、ループで呼び出す
 		if(more) {
@@ -132,6 +138,7 @@ public class SOQLExecutor {
 				fieldList.addAll(Arrays.stream(result.getRecords())
 						.map(r -> toMapRecord(fields, r))
 						.collect(Collectors.toList()));
+				logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
 			}
 		}
 
@@ -144,7 +151,7 @@ public class SOQLExecutor {
 	 * @param record 検索結果
 	 * @return 項目と値のペア
 	 */
-	private static Map<String, String> toMapRecord(String[] fields, SObjectWrapper record) {
+	private static Map<String, String> toMapRecord(List<String> fields, SObjectWrapper record) {
 		Map<String, String> fieldMap = new HashMap<>();
 
 		// 項目名をもとに値とのペアを作成
@@ -155,12 +162,17 @@ public class SOQLExecutor {
 			// SOQLで参照を経由している場合、経由先を辿る
 			XmlObjectWrapper obj = null;
 			for(String key : keys) {
+				// API名を取得
+				Iterator<XmlObjectWrapper> children = obj == null ? record.getChildren() : obj.getChildren();
+				String apiKey = toAPIName(children, key).orElse(key);
+
+				// 項目の値か参照先を取得
 				if(lastKey.equals(key)) {
-					// 項目の値を取得
-					String value = obj == null ? record.getField(lastKey) : obj.getField(lastKey);
+					String value = (String) (obj == null ? record.getField(apiKey) : obj.getField(apiKey));
 					fieldMap.put(field, value);
+					logger.debug(resources.getString(Constants.Message.Information.MSG_008), field, value);
 				} else {
-					obj = obj == null ? record.getChild(key) : obj.getChild(key);
+					obj = obj == null ? record.getChild(apiKey) : obj.getChild(apiKey);
 				}
 			}
 
@@ -168,6 +180,20 @@ public class SOQLExecutor {
 
 		return fieldMap;
 
+	}
+
+	/**
+	 * 項目名をAPI名に変換
+	 * @param objects 要素一覧
+	 * @param queryName クエリでの名前
+	 * @return API名
+	 */
+	private static Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
+		List<XmlObjectWrapper> list = new LinkedList<>();
+		objects.forEachRemaining(i -> list.add(i));
+		Optional<String> apiName = list.stream().map(i -> i.getName().getLocalPart().toLowerCase()).filter(i -> i.toLowerCase().equals(queryName.toLowerCase())).findFirst();
+		logger.debug(resources.getString(Constants.Message.Information.MSG_007), queryName, apiName);
+		return apiName;
 	}
 
 }
