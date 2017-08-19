@@ -62,7 +62,7 @@ public class SOQLExecutorTest {
 		// レコードの作成
 		normalRecords = new SObjectWrapperMock[1];
 		normalRecords[0] = new SObjectWrapperMock();
-		normalRecords[0].addChild(createColumn("name", "value"));
+		normalRecords[0].addChild(createColumn("Name", "value"));
 
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
@@ -213,7 +213,7 @@ public class SOQLExecutorTest {
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 
 		// 項目の値を取得できること
-		assertThat(records.get(0).get("namE"), is((String)normalRecords[0].getField("name")));
+		assertThat(records.get(0).get("namE"), is((String)normalRecords[0].getField("Name")));
 
 	}
 

@@ -113,7 +113,7 @@ public class SOQLExecutor {
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
 		}
 
-		// サブクエリは対象外（解析が複雑になるので）
+		// サブクエリ、集計関数は対象外（解析が複雑になるので）
 		if(selectField.contains(Constants.SOQL.SUBQUERY_LEFT_SIGN)) {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_003));
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_003));
@@ -191,7 +191,7 @@ public class SOQLExecutor {
 	private static Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
 		List<XmlObjectWrapper> list = new LinkedList<>();
 		objects.forEachRemaining(i -> list.add(i));
-		Optional<String> apiName = list.stream().map(i -> i.getName().getLocalPart().toLowerCase()).filter(i -> i.toLowerCase().equals(queryName.toLowerCase())).findFirst();
+		Optional<String> apiName = list.stream().map(i -> i.getName().getLocalPart()).filter(i -> i.toLowerCase().equals(queryName.toLowerCase())).findFirst();
 		logger.debug(resources.getString(Constants.Message.Information.MSG_007), queryName, apiName);
 		return apiName;
 	}

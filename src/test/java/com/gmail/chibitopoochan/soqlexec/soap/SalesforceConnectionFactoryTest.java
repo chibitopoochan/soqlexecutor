@@ -41,8 +41,8 @@ public class SalesforceConnectionFactoryTest {
     	result.setSessionId("sessionId");
 
     	// Loginを実行
-    	factory = new SalesforceConnectionFactory(url, username, password);
-    	factory.setConnectionWrapper(mock);
+    	factory = SalesforceConnectionFactory.newInstance(url, username, password);
+    	factory.setPartnerConnection(mock);
     	factory.setLoginResult(result);
 
 	}
@@ -51,7 +51,7 @@ public class SalesforceConnectionFactoryTest {
 	 * Getter/Setter検証のケース
 	 */
 	@Test public void testSetterGetter() {
-		assertThat(factory.getConnectionWrapper(), is(mock));
+		assertThat(factory.getPartnerConnection(), is(mock));
 	}
 
 	/**

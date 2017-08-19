@@ -19,6 +19,8 @@ public class Constants {
 			public static final String ERR_006 = "ERR.006";
 			public static final String ERR_007 = "ERR.007";
 			public static final String ERR_008 = "ERR.008";
+			public static final String ERR_009 = "ERR.009";
+			public static final String ERR_010 = "ERR.010";
 		}
 
 		public class Information {
@@ -31,6 +33,8 @@ public class Constants {
 			public static final String MSG_007 = "MSG.007";
 			public static final String MSG_008 = "MSG.008";
 			public static final String MSG_009 = "MSG.009";
+			public static final String MSG_010 = "MSG.010";
+			public static final String MSG_011 = "MSG.011";
 		}
 
 	}
@@ -53,6 +57,7 @@ public class Constants {
 		public class Command {
 			public static final String QUIT = "quit";
 			public static final String SET = "set";
+			public static final String SEPARATE = " ";
 		}
 
 		/**

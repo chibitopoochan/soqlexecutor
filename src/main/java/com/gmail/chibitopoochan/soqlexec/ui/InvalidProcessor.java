@@ -7,7 +7,12 @@ public class InvalidProcessor implements Processor {
 	public void execute() {
 	}
 
+	@Override
 	public void setParameter(Map<String, String> parameter) {
+	}
+
+	@Override
+	public void setSOQLExecutor(com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor executor) {
 	}
 
 }

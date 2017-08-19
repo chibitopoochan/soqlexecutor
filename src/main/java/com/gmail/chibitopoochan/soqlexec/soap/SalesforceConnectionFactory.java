@@ -1,4 +1,5 @@
 package com.gmail.chibitopoochan.soqlexec.soap;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import com.sforce.ws.ConnectorConfig;
 /**
  * Salesforceへの接続を提供.
  * SalesforceへのI/Fを提供するコネクタを生成します。
- * 接続情報を初期化時に決定するため、変更する場合は別のインスタンスを作成してください。
+ * 接続情報を初期化時に決定するため、変更する場合は別のインスタンスを作成が必要です。
  */
 public class SalesforceConnectionFactory {
 	// クラス共通の参照
@@ -27,13 +28,40 @@ public class SalesforceConnectionFactory {
 	private String username;
 	private String password;
 
+	// 自身のインスタンス
+	private static Optional<SalesforceConnectionFactory> factory = Optional.empty();
+
+	public static void setSalesforceConnectionFactory(SalesforceConnectionFactory factory) {
+		SalesforceConnectionFactory.factory = Optional.of(factory);
+	}
+
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password) {
+		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password));
+	}
+
+	/**
+	 * 接続情報を持たないコネクタを作成
+	 */
+	public SalesforceConnectionFactory() {}
+
 	/**
 	 * 接続情報を持つコネクタを作成します
 	 * @param authEndPoint 認証先URL
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 */
-	public SalesforceConnectionFactory(String authEndPoint, String username, String password) {
+	private SalesforceConnectionFactory(String authEndPoint, String username, String password) {
+		setParameter(authEndPoint, username, password);
+
+	}
+
+	/**
+	 * 接続情報を設定
+	 * @param authEndPoint 接続先
+	 * @param username ユーザ名
+	 * @param password パスワード
+	 */
+	public void setParameter(String authEndPoint, String username, String password) {
 		connection = new PartnerConnectionWrapper();
         config = new ConnectorConfig();
         config.setAuthEndpoint(authEndPoint);
@@ -49,7 +77,7 @@ public class SalesforceConnectionFactory {
 	 * SalesforceAPIのラッパーを設定
 	 * @param wrapper SalesforceAPIのラッパー
 	 */
-	public void setConnectionWrapper(PartnerConnectionWrapper wrapper) {
+	public void setPartnerConnection(PartnerConnectionWrapper wrapper) {
 		this.connection = wrapper;
 	}
 
@@ -58,7 +86,7 @@ public class SalesforceConnectionFactory {
 	 * 取得時に都度接続を生成
 	 * @return SalesforceAPIのラッパー
 	 */
-	public PartnerConnectionWrapper getConnectionWrapper() {
+	public PartnerConnectionWrapper getPartnerConnection() {
 		// 接続設定を再作成
         ConnectorConfig config = new ConnectorConfig();
         config.setAuthEndpoint(loginResult.getServerUrl());
@@ -118,7 +146,7 @@ public class SalesforceConnectionFactory {
 
 		try {
 			// ログアウト
-			getConnectionWrapper().logout();
+			getPartnerConnection().logout();
 			isSuccess = true;
 
 			// ログ出力

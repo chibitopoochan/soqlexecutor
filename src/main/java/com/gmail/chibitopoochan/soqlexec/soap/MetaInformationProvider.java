@@ -81,7 +81,6 @@ public class MetaInformationProvider {
 		if (info.getType() == FieldType.picklist.name()) {
 			List<String> picklist = Arrays
 					.stream(metaInfo.getPicklistValues())
-					.filter(p -> p != null)
 					.filter(p -> p.isActive())
 					.map(p -> p.getValue())
 					.collect(Collectors.toList());
@@ -92,7 +91,6 @@ public class MetaInformationProvider {
 		} else if (info.getType() == FieldType.reference.name()) {
 			List<String> referList = Arrays
 					.stream(metaInfo.getReferenceTo())
-					.filter(r -> r != null)
 					.collect(Collectors.toList());
 
 			info.setReferenceToList(referList);

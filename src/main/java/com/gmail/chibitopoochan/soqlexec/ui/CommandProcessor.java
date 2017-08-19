@@ -1,14 +1,12 @@
 package com.gmail.chibitopoochan.soqlexec.ui;
 
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.ENV;
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.ID;
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.PWD;
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.QUERY;
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.SET;
-
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor;
 import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
-import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -24,87 +21,76 @@ import com.sforce.ws.ConnectionException;
  * <h3>コマンド形式</h3>
  * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
  */
-public class CommandProcessor implements Processor {
+public class CommandProcessor extends AbstractProcessor {
 	// クラス共通の参照
 	private static final Logger logger = LoggerFactory.getLogger(CommandProcessor.class);
-	private static final ResourceBundle properties = ResourceBundle.getBundle(Constants.Properties.RESOURCE);
+	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
-	private String username;
-	private String password;
-	private String soql;
-	private String env;
-	private boolean more;
-	private boolean all;
+	private OutputStream out = System.out;
+	private boolean occurredError;
 
-	private SOQLExecutor executor;
+	// 列の区切り文字
+	private String separate = "|";
 
-	public CommandProcessor() {
-		executor = new SOQLExecutor();
+	public void setOutputStream(OutputStream out) {
+		this.out = out;
 	}
 
 	/**
-	 * パラメータの設定.
-	 * キー項目、値は入力値チェック済みを想定
-	 * @param parameter パラメータのキー項目／値のセット
+	 * SOQL処理の実行
 	 */
-	@Override
-	public void setParameter(Map<String, String> parameter) {
-		username = parameter.get(ID);
-		password = parameter.get(PWD);
-		soql = parameter.get(QUERY);
-
-		if(parameter.containsKey(ENV)) {
-			env = parameter.get(ENV);
-		} else {
-			env = properties.getString(Constants.Properties.UserInterface.AUTH_END_POINT);
-		}
-
-		if(parameter.containsKey(SET)) {
-			String options = parameter.get(SET);
-			String[] option = options.split(Option.DELIMITA);
-			for(String s : option) {
-				String[] values = s.split(Option.SIGN);
-				if(Option.MORE.equals(values[0])){
-					more = Boolean.parseBoolean(values[1]);
-				}
-				if(Option.ALL.equals(values[0])){
-					all = Boolean.parseBoolean(values[1]);
-				}
-			}
-		}
-
-	}
-
 	@Override
 	public void execute() {
 		// SFDCへ接続
-		SalesforceConnectionFactory factory = new SalesforceConnectionFactory(env, username, password);
-		if(factory.login()) {
-			logger.info("");
-		} else {
-			logger.warn("");
+		SalesforceConnectionFactory factory =
+				SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
+		if(!factory.login()) {
+			occurredError = true;
 			return;
 		}
 
 		// パラメータを指定
-		executor.setPartnerConnection(factory.getConnectionWrapper());
-		executor.setAllOption(all);
-		executor.setMoreOption(more);
+		SOQLExecutor executor = getSOQLExecutor();
+		executor.setPartnerConnection(factory.getPartnerConnection());
+		executor.setAllOption(isAll());
+		executor.setMoreOption(isMore());
 
-		try {
-			List<Map<String, String>> result = executor.execute(soql);
-			result.stream().flatMap(m -> m.keySet().stream().map(k -> k + "|" + m.get(k))).forEach(System.out::println);;
+		// SOQLを実行
+		try(PrintWriter writer = new PrintWriter(out)) {
+			// クエリを実行
+			List<Map<String, String>> result = getSOQLExecutor().execute(getQuery());
+
+			// 結果が空なら処理終了
+			if(result.isEmpty()) return;
+
+			// ヘッダーを出力
+			String[] headers = result.get(0).keySet().toArray(new String[0]);
+			writer.println(Arrays.stream(headers).collect(Collectors.joining(separate)));
+
+			// 行を出力
+			result.stream().map(r ->
+				Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
+			).forEach(writer::println);
+
+			writer.flush();
 		} catch (ConnectionException e) {
-			logger.error(e.toString());
-			logger.warn("",e);
+			logger.error(resources.getString(Constants.Message.Error.ERR_009), e.toString());
+			logger.debug(resources.getString(Constants.Message.Error.ERR_010),e);
+			occurredError = true;
+		} finally {
+			// ログアウト
+			factory.logout();
+
 		}
 
-		// ログアウト
-		if(factory.logout()){
-			logger.info("");
-		} else {
-			logger.warn("");
-		}
+	}
+
+	/**
+	 * エラーの発生.
+	 * @return 一度でもエラーが発生していればtrue
+	 */
+	public boolean isOccurredError() {
+		return occurredError;
 	}
 
 }
