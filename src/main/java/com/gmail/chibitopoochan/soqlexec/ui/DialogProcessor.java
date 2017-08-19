@@ -9,6 +9,8 @@ import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Par
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.SIGN;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -18,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor;
 import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
-import com.sforce.ws.ConnectionException;
+import com.gmail.chibitopoochan.soqlexec.util.Constants.Message.Information;
 
 /**
  * 対話形式でSOQLを実行.
@@ -26,6 +28,9 @@ import com.sforce.ws.ConnectionException;
  * SOQLExecutor -id [username] -pwd [password] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
  */
 public class DialogProcessor extends AbstractProcessor {
+	// 入力待ちの記号
+	public static final String WAIT_SIGN = ">";
+
 	// クラス共通の参照
 	private static final Logger logger = LoggerFactory.getLogger(DialogProcessor.class);
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
@@ -35,6 +40,7 @@ public class DialogProcessor extends AbstractProcessor {
 	private boolean inQuery; // クエリの受付中か
 	private boolean exit; // 処理が終了したか
 	private boolean occurredError; // 一度でもエラーが発生したか
+	private Optional<String> errorMessage = Optional.empty();
 
 	// 入出力先（初期は標準入出力）
 	private InputStream in = System.in;
@@ -44,13 +50,17 @@ public class DialogProcessor extends AbstractProcessor {
 	 */
 	@Override
 	public void execute() {
+		PrintWriter writer = new PrintWriter(getOutputStream(), true);
+
 		// SFDCへ接続
+		writer.println(resources.getString(Information.MSG_012));
 		SalesforceConnectionFactory factory =
 				SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
 		if(!factory.login()) {
 			occurredError = true;
 			return;
 		}
+		writer.println(resources.getString(Information.MSG_013));
 
 		// パラメータを指定
 		SOQLExecutor executor = getSOQLExecutor();
@@ -60,9 +70,14 @@ public class DialogProcessor extends AbstractProcessor {
 
 		// ユーザ入力を処理
 		try(Scanner scan = new Scanner(in)){
+			writer.printf(WAIT_SIGN);
 			while(!exit && scan.hasNextLine()) {
 				analyzeLine(scan.nextLine());
+				errorMessage.ifPresent(writer::println);
+				errorMessage = Optional.empty();
+				if(!exit) writer.printf(WAIT_SIGN);
 			}
+
 		}
 
 	}
@@ -76,8 +91,6 @@ public class DialogProcessor extends AbstractProcessor {
 
 		if(!inQuery) analyzeCommand(line);
 		if(inQuery) analyzeQuery(line);
-
-		System.out.println(">"); // TODO
 
 	}
 
@@ -101,8 +114,9 @@ public class DialogProcessor extends AbstractProcessor {
 
 		try {
 			executeSOQL();
-		} catch (ConnectionException e) {
+		} catch (Exception e) {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_010), e);
+			errorMessage = Optional.of(e.toString());
 			occurredError = true;
 		} finally {
 			query.setLength(0);
@@ -123,6 +137,7 @@ public class DialogProcessor extends AbstractProcessor {
 			getSOQLExecutor().setAllOption(value);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_008), key);
+			errorMessage = Optional.of(resources.getString(Constants.Message.Error.ERR_011));
 			occurredError = true;
 		}
 	}
@@ -149,6 +164,7 @@ public class DialogProcessor extends AbstractProcessor {
 
 			if(parameters.length != 2) {
 				logger.warn(resources.getString(Constants.Message.Error.ERR_007));
+				errorMessage = Optional.of(resources.getString(Constants.Message.Error.ERR_012));
 				occurredError = true;
 				break;
 			}

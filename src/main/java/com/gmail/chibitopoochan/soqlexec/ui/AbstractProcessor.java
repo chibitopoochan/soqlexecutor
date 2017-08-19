@@ -113,29 +113,40 @@ public abstract class AbstractProcessor implements Processor {
 	}
 
 	/**
+	 * 出力先の取得
+	 * @return 出力先
+	 */
+	public OutputStream getOutputStream() {
+		return out;
+	}
+
+	/**
 	 * SOQLの実行.
 	 * 実行結果は指定の出力先に出力
 	 * @throws ConnectionException SOQL実行時エラー
 	 */
 	protected void executeSOQL() throws ConnectionException {
-		try(PrintWriter writer = new PrintWriter(out)) {
-			// クエリを実行
-			List<Map<String, String>> result = getSOQLExecutor().execute(getQuery());
+		// 出力用にラッピング
+		// 通常はtry-with-resourcesでCloseするが、標準出力を使いまわすので使用しない
+		PrintWriter writer = new PrintWriter(out);
 
-			// 結果が空なら処理終了
-			if(result.isEmpty()) return;
+		// クエリを実行
+		List<Map<String, String>> result = getSOQLExecutor().execute(getQuery());
 
-			// ヘッダーを出力
-			String[] headers = result.get(0).keySet().toArray(new String[0]);
-			writer.println(Arrays.stream(headers).collect(Collectors.joining(separate)));
+		// 結果が空なら処理終了
+		if(result.isEmpty()) return;
 
-			// 行を出力
-			result.stream().map(r ->
-				Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
-			).forEach(writer::println);
+		// ヘッダーを出力
+		String[] headers = result.get(0).keySet().toArray(new String[0]);
+		writer.println(Arrays.stream(headers).collect(Collectors.joining(separate)));
 
-			writer.flush();
-		}
+		// 行を出力
+		result.stream().map(r ->
+			Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
+		).forEach(writer::println);
+
+		writer.flush();
+
 	}
 
 	/**

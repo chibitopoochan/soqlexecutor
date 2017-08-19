@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,12 +22,16 @@ import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PartnerConnectionWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SOQLExecutorMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SalesforceConnectionFactoryMock;
+import com.gmail.chibitopoochan.soqlexec.util.Constants;
+import com.gmail.chibitopoochan.soqlexec.util.Constants.Message.Information;
 import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter;
 
 /**
  * DialogProcessorのテストクラス
  */
 public class DialogProcessorTest {
+	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
+
 	// 検証に使用するインスタンス
 	private SalesforceConnectionFactoryMock factory;
 	private SOQLExecutorMock executor;
@@ -420,10 +425,17 @@ public class DialogProcessorTest {
 		assertFalse(pro.isOccurredError());
 
 		StringBuilder output = new StringBuilder();
-		output.append("Id")
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id")
 		.append(System.lineSeparator())
 		.append("result1")
-		.append(System.lineSeparator());
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
 		assertThat(toTest.toByteArray(), is(output.toString().getBytes()));
 
 	}
@@ -471,12 +483,19 @@ public class DialogProcessorTest {
 		assertFalse(pro.isOccurredError());
 
 		StringBuilder output = new StringBuilder();
-		output.append("Id|name|email")
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id|name|email")
 		.append(System.lineSeparator())
 		.append("Id1|name1|email1")
 		.append(System.lineSeparator())
 		.append("Id2|name2|email2")
-		.append(System.lineSeparator());
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
 		assertThat(toTest.toString(), is(output.toString()));
 
 	}
@@ -508,7 +527,74 @@ public class DialogProcessorTest {
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
-		assertThat(toTest.toByteArray(), is(new Byte[0]));
+
+		StringBuilder output = new StringBuilder();
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN);
+
+		assertThat(toTest.toString(), is(output.toString()));
+
+	}
+
+	/**
+	 * 「SELECT Id From user;」を二回実行して、「quit」で正常終了
+	 * クエリを二回実行するパターン
+	 */
+	@Test public void testMultiQuery() {
+		// 検索結果
+		Map<String, String> result1 = new HashMap<>();
+		result1.put("Id", "result1");
+
+		List<Map<String, String>> result = new ArrayList<>();
+		result.add(result1);
+
+		executor.putResult("SELECT Id From user", result);
+
+		// 入力
+		StringBuilder input = new StringBuilder();
+		input.append("SELECT Id From user;")
+		.append(System.lineSeparator())
+		.append("SELECT Id From user;")
+		.append(System.lineSeparator())
+		.append("quit");
+
+		ByteArrayInputStream byTest = new ByteArrayInputStream(input.toString().getBytes());
+		ByteArrayOutputStream toTest = new ByteArrayOutputStream();
+		pro.setInputStream(byTest);
+		pro.setOutputStream(toTest);
+
+		pro.execute();
+
+		assertTrue(factory.isLogin());
+		assertFalse(executor.getAllOption());
+		assertFalse(executor.getMoreOption());
+		assertTrue(pro.isExit());
+		assertThat(executor.getPartnerConnection(), is(connection));
+		assertFalse(pro.isOccurredError());
+
+		StringBuilder output = new StringBuilder();
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id")
+		.append(System.lineSeparator())
+		.append("result1")
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id")
+		.append(System.lineSeparator())
+		.append("result1")
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
+		assertThat(toTest.toString(), is(output.toString()));
 
 	}
 
@@ -539,7 +625,18 @@ public class DialogProcessorTest {
 		assertFalse(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
-		assertThat(toTest.toByteArray(), is(new Byte[0]));
+
+		StringBuilder output = new StringBuilder();
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN);
+
+		assertThat(toTest.toString(), is(output.toString()));
 
 	}
 
@@ -576,10 +673,17 @@ public class DialogProcessorTest {
 		assertFalse(pro.isOccurredError());
 
 		StringBuilder output = new StringBuilder();
-		output.append("Id")
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id")
 		.append(System.lineSeparator())
 		.append("result1")
-		.append(System.lineSeparator());
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
 		assertThat(toTest.toString(), is(output.toString()));
 
 	}
@@ -659,10 +763,20 @@ public class DialogProcessorTest {
 		assertFalse(pro.isOccurredError());
 
 		StringBuilder output = new StringBuilder();
-		output.append("Id")
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id")
 		.append(System.lineSeparator())
 		.append("result1")
-		.append(System.lineSeparator());
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
 		assertThat(toTest.toString(), is(output.toString()));
 
 	}

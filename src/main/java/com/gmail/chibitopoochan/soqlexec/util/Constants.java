@@ -21,6 +21,8 @@ public class Constants {
 			public static final String ERR_008 = "ERR.008";
 			public static final String ERR_009 = "ERR.009";
 			public static final String ERR_010 = "ERR.010";
+			public static final String ERR_011 = "ERR.011";
+			public static final String ERR_012 = "ERR.012";
 		}
 
 		public class Information {
@@ -35,6 +37,8 @@ public class Constants {
 			public static final String MSG_009 = "MSG.009";
 			public static final String MSG_010 = "MSG.010";
 			public static final String MSG_011 = "MSG.011";
+			public static final String MSG_012 = "MSG.012";
+			public static final String MSG_013 = "MSG.013";
 		}
 
 	}

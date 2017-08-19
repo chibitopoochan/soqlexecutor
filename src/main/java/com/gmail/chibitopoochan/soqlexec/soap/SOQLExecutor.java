@@ -101,7 +101,7 @@ public class SOQLExecutor {
 
 		// SELECT文から項目を抽出
 		Matcher match = Pattern
-				.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
+				.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL)
 				.matcher(soql);
 
 		// 項目が抽出できたか確認
