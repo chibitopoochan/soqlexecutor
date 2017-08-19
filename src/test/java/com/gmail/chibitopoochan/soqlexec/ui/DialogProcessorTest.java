@@ -37,6 +37,7 @@ public class DialogProcessorTest {
 	private SOQLExecutorMock executor;
 	private PartnerConnectionWrapperMock connection;
 	private DialogProcessor pro;
+	private SOQLExecutorMock.QueryMoreMock more;
 
 	/**
 	 * テスト前の共通設定
@@ -64,6 +65,8 @@ public class DialogProcessorTest {
 		factory = new SalesforceConnectionFactoryMock();
 		factory.setPartnerConnection(connection);
 		executor = new SOQLExecutorMock();
+		more = executor.new QueryMoreMock();
+		executor.setQueryMore(more);
 		pro = new DialogProcessor();
 		pro.setSOQLExecutor(executor);
 		pro.setParameter(parameter);
@@ -86,7 +89,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -107,7 +110,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -128,7 +131,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -148,7 +151,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertFalse(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -173,7 +176,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertTrue(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -198,7 +201,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertTrue(executor.getMoreOption());
+		assertTrue(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 
@@ -225,7 +228,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 	}
@@ -251,7 +254,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertTrue(pro.isOccurredError());
@@ -276,7 +279,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertTrue(pro.isOccurredError());
@@ -301,7 +304,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertTrue(pro.isOccurredError());
@@ -327,7 +330,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertTrue(pro.isOccurredError());
@@ -356,7 +359,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -383,7 +386,7 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
+		assertFalse(pro.isMore());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertTrue(pro.isOccurredError());
@@ -403,6 +406,7 @@ public class DialogProcessorTest {
 		result.add(result1);
 
 		executor.putResult("SELECT Id From user", result);
+		more.setMore(result);
 
 		// 入力
 		StringBuilder input = new StringBuilder();
@@ -419,7 +423,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -461,6 +464,7 @@ public class DialogProcessorTest {
 		result.add(result2);
 
 		executor.putResult("SELECT Id,Name,Email From user", result);
+		more.setMore(result);
 
 		// 入力
 		StringBuilder input = new StringBuilder();
@@ -477,7 +481,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -508,6 +511,7 @@ public class DialogProcessorTest {
 		List<Map<String, String>> result = new ArrayList<>();
 
 		executor.putResult("SELECT Id From user", result);
+		more.setMore(result);
 
 		StringBuilder input = new StringBuilder();
 		input.append("SELECT Id From user;")
@@ -523,7 +527,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -542,6 +545,74 @@ public class DialogProcessorTest {
 	}
 
 	/**
+	 * 「SELECT Id From user;」「quit」で正常終了するケース
+	 * 追加レコードを取得できるケース
+	 */
+	@Test public void testQueryMoreRecord() {
+		// 検索結果
+		Map<String, String> result1 = new LinkedHashMap<>();
+		result1.put("Id", "Id1");
+		result1.put("name", "name1");
+		result1.put("email", "email1");
+
+		Map<String, String> result2 = new LinkedHashMap<>();
+		result2.put("Id", "Id2");
+		result2.put("name", "name2");
+		result2.put("email", "email2");
+
+		List<Map<String, String>> result = new ArrayList<>();
+		result.add(result1);
+		result.add(result2);
+
+		executor.putResult("SELECT Id,Name,Email From user", result);
+		more.setMore(result);
+
+		// 入力
+		StringBuilder input = new StringBuilder();
+		input
+		.append("SET more=true")
+		.append(System.lineSeparator())
+		.append("SELECT Id,Name,Email From user;")
+		.append(System.lineSeparator())
+		.append("quit");
+
+		ByteArrayInputStream byTest = new ByteArrayInputStream(input.toString().getBytes());
+		ByteArrayOutputStream toTest = new ByteArrayOutputStream();
+		pro.setInputStream(byTest);
+		pro.setOutputStream(toTest);
+
+		pro.execute();
+
+		assertTrue(factory.isLogin());
+		assertFalse(executor.getAllOption());
+		assertTrue(pro.isExit());
+		assertThat(executor.getPartnerConnection(), is(connection));
+		assertFalse(pro.isOccurredError());
+
+		StringBuilder output = new StringBuilder();
+		output
+		.append(resources.getString(Information.MSG_012))
+		.append(System.lineSeparator())
+		.append(resources.getString(Information.MSG_013))
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN)
+		.append(DialogProcessor.WAIT_SIGN)
+		.append("Id|name|email")
+		.append(System.lineSeparator())
+		.append("Id1|name1|email1")
+		.append(System.lineSeparator())
+		.append("Id2|name2|email2")
+		.append(System.lineSeparator())
+		.append("Id1|name1|email1")
+		.append(System.lineSeparator())
+		.append("Id2|name2|email2")
+		.append(System.lineSeparator())
+		.append(DialogProcessor.WAIT_SIGN);
+		assertThat(toTest.toString(), is(output.toString()));
+
+	}
+
+	/**
 	 * 「SELECT Id From user;」を二回実行して、「quit」で正常終了
 	 * クエリを二回実行するパターン
 	 */
@@ -554,6 +625,7 @@ public class DialogProcessorTest {
 		result.add(result1);
 
 		executor.putResult("SELECT Id From user", result);
+		more.setMore(result);
 
 		// 入力
 		StringBuilder input = new StringBuilder();
@@ -572,7 +644,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -606,6 +677,7 @@ public class DialogProcessorTest {
 		List<Map<String, String>> result = new ArrayList<>();
 
 		executor.putResult("SELECT Id From user\nquit", result);
+		more.setMore(result);
 
 		StringBuilder input = new StringBuilder();
 		input.append("SELECT Id From user")
@@ -621,7 +693,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertFalse(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -652,6 +723,7 @@ public class DialogProcessorTest {
 		result.add(result1);
 
 		executor.putResult("SELECT Id From user where name=\"abc;def\"", result);
+		more.setMore(result);
 
 		StringBuilder input = new StringBuilder();
 		input.append("SELECT Id From user where name=\"abc;def\";")
@@ -667,7 +739,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -701,6 +772,7 @@ public class DialogProcessorTest {
 		result.add(result1);
 
 		executor.putResult("SELECT Id From user where name=\"abc;def", result);
+		more.setMore(result);
 
 		StringBuilder input = new StringBuilder();
 		input.append("SELECT Id From user where name=\"abc;def;")
@@ -715,7 +787,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertFalse(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());
@@ -741,6 +812,7 @@ public class DialogProcessorTest {
 		.append(System.lineSeparator());
 
 		executor.putResult(query.toString(), result);
+		more.setMore(result);
 
 		StringBuilder input = new StringBuilder();
 		input.append(query.toString())
@@ -757,7 +829,6 @@ public class DialogProcessorTest {
 
 		assertTrue(factory.isLogin());
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(pro.isExit());
 		assertThat(executor.getPartnerConnection(), is(connection));
 		assertFalse(pro.isOccurredError());

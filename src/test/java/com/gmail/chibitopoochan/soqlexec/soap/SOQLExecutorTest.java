@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -200,7 +201,6 @@ public class SOQLExecutorTest {
 
 		// SOQL実行のパラメータを設定
 		executor.setBatchSize(1);
-		executor.setMoreOption(false);
 		executor.setAllOption(false);
 
 		// SOQLを実行
@@ -232,7 +232,6 @@ public class SOQLExecutorTest {
 		connection.setSuccess(true);
 
 		// SOQL実行のパラメータを設定
-		executor.setMoreOption(false);
 		executor.setAllOption(true);
 
 		// SOQLを実行
@@ -261,19 +260,24 @@ public class SOQLExecutorTest {
 		connection.setSuccess(true);
 
 		// SOQL実行のパラメータを設定
-		executor.setMoreOption(true);
 		executor.setAllOption(false);
 
 		// SOQLを実行
 		List<Map<String, String>> records = executor.execute(SOQL_MORE);
+		List<Map<String, String>> moreList = new LinkedList<>();
+		SOQLExecutor.QueryMore more = executor.getQueryMore();
+		while(!more.isDone()) {
+			moreList.addAll(more.execute());
+		}
 
 		// 結果の確認
 		// パラメータが渡されていること
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
-		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(2)));
+		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 		assertThat(records.get(0).get("nAme"), is(normalRecords[0].getField("name")));
-		assertThat(records.get(1).get("nAme"), is(moreRecords[0].getField("name")));
+		assertThat(Integer.valueOf(moreList.size()), is(Integer.valueOf(1)));
+		assertThat(moreList.get(0).get("nAme"), is(moreRecords[0].getField("name")));
 	}
 
 	/**
@@ -291,7 +295,6 @@ public class SOQLExecutorTest {
 		connection.setSuccess(true);
 
 		// SOQL実行のパラメータを設定
-		executor.setMoreOption(false);
 		executor.setAllOption(false);
 
 		// SOQLを実行
@@ -326,7 +329,6 @@ public class SOQLExecutorTest {
 
 		// SOQL実行のパラメータを設定
 		executor.setBatchSize(1);
-		executor.setMoreOption(false);
 		executor.setAllOption(false);
 
 		// 例外発生を想定

@@ -66,7 +66,6 @@ public class DialogProcessor extends AbstractProcessor {
 		SOQLExecutor executor = getSOQLExecutor();
 		executor.setPartnerConnection(factory.getPartnerConnection());
 		executor.setAllOption(isAll());
-		executor.setMoreOption(isMore());
 
 		// ユーザ入力を処理
 		try(Scanner scan = new Scanner(in)){
@@ -132,7 +131,7 @@ public class DialogProcessor extends AbstractProcessor {
 	 */
 	private void analyzeSetOption(String key, boolean value) {
 		if(MORE.equals(key)) {
-			getSOQLExecutor().setMoreOption(value);
+			setMore(value);
 		} else if(ALL.equals(key)) {
 			getSOQLExecutor().setAllOption(value);
 		} else {

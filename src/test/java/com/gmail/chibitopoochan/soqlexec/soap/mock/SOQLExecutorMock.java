@@ -12,10 +12,19 @@ import com.sforce.ws.ConnectionException;
 public class SOQLExecutorMock extends SOQLExecutor {
 	private PartnerConnectionWrapper connection;
 	private int size;
-	private boolean more;
 	private boolean all;
 	private boolean error;
 	private Map<String, List<Map<String, String>>> resultMap = new HashMap<>();
+	private QueryMore more;
+
+	public void setQueryMore(QueryMore more) {
+		this.more = more;
+	}
+
+	@Override
+	public QueryMore getQueryMore() {
+		return more;
+	}
 
 	@Override
 	public void setPartnerConnection(PartnerConnectionWrapper connection) {
@@ -33,15 +42,6 @@ public class SOQLExecutorMock extends SOQLExecutor {
 
 	public int getBatchSize() {
 		return size;
-	}
-
-	@Override
-	public void setMoreOption(boolean more) {
-		this.more = more;
-	}
-
-	public boolean getMoreOption() {
-		return more;
 	}
 
 	@Override
@@ -72,6 +72,28 @@ public class SOQLExecutorMock extends SOQLExecutor {
 		} else {
 			return new ArrayList<>();
 		}
+	}
+
+	public class QueryMoreMock extends QueryMore {
+		private List<Map<String, String>> more;
+		private boolean done = true;
+
+		public void setMore(List<Map<String,String>> more) {
+			this.more = more;
+			done = false;
+		}
+
+		@Override
+		public boolean isDone() {
+			return done;
+		}
+
+		@Override
+		public List<Map<String, String>> execute() throws ConnectionException {
+			done = true;
+			return more;
+		}
+
 	}
 
 }

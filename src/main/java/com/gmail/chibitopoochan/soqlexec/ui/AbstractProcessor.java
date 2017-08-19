@@ -145,6 +145,17 @@ public abstract class AbstractProcessor implements Processor {
 			Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
 		).forEach(writer::println);
 
+		// 追加でレコードを取得
+		if(more) {
+			SOQLExecutor.QueryMore queryMore = getSOQLExecutor().getQueryMore();
+			while(!queryMore.isDone()) {
+				queryMore.execute().stream().map(r ->
+					Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
+				).forEach(writer::println);
+				writer.flush();
+			}
+		}
+
 		writer.flush();
 
 	}
@@ -179,6 +190,14 @@ public abstract class AbstractProcessor implements Processor {
 	 */
 	protected String getPassword() {
 		return password;
+	}
+
+	/**
+	 * Moreオプションの設定
+	 * @param more 有効ならtrue
+	 */
+	protected void setMore(boolean more) {
+		this.more = more;
 	}
 
 	/**

@@ -39,7 +39,6 @@ public class CommandProcessor extends AbstractProcessor {
 		SOQLExecutor executor = getSOQLExecutor();
 		executor.setPartnerConnection(factory.getPartnerConnection());
 		executor.setAllOption(isAll());
-		executor.setMoreOption(isMore());
 
 		// SOQLを実行
 		try {

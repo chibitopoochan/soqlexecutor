@@ -27,6 +27,7 @@ public class CommandProcessorTest {
 	private SalesforceConnectionFactoryMock factory;
 	private PartnerConnectionWrapperMock partner;
 	private ByteArrayOutputStream toTest;
+	private SOQLExecutorMock.QueryMoreMock more;
 
 	@Before public void setup() {
 		// モックを作成
@@ -35,6 +36,7 @@ public class CommandProcessorTest {
 		partner = new PartnerConnectionWrapperMock();
 		processor = new CommandProcessor();
 		factory = new SalesforceConnectionFactoryMock();
+		more = executor.new QueryMoreMock();
 
 		// 共通のパラメータを設定
 		parameter = new HashMap<>();
@@ -42,6 +44,7 @@ public class CommandProcessorTest {
 		parameter.put(Parameter.PWD, "pwd");
 
 		// 参照先を指定
+		executor.setQueryMore(more);
 		processor.setSOQLExecutor(executor);
 		processor.setOutputStream(toTest);
 		factory.setPartnerConnection(partner);
@@ -65,13 +68,13 @@ public class CommandProcessorTest {
 		List<Map<String, String>> result = new LinkedList<>();
 		result.add(record);
 		executor.putResult(query, result);
+		more.setMore(result);
 
 		processor.execute();
 
 		assertTrue(factory.isLogin());
 		assertThat(executor.getPartnerConnection(), is(partner));
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(factory.isLogout());
 
 		StringBuilder out = new StringBuilder();
@@ -106,13 +109,13 @@ public class CommandProcessorTest {
 		result.add(record);
 		result.add(record2);
 		executor.putResult(query, result);
+		more.setMore(result);
 
 		processor.execute();
 
 		assertTrue(factory.isLogin());
 		assertThat(executor.getPartnerConnection(), is(partner));
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(factory.isLogout());
 
 		StringBuilder out = new StringBuilder();
@@ -140,16 +143,54 @@ public class CommandProcessorTest {
 		// 実行結果を設定
 		List<Map<String, String>> result = new LinkedList<>();
 		executor.putResult(query, result);
+		more.setMore(result);
 
 		processor.execute();
 
 		assertTrue(factory.isLogin());
 		assertThat(executor.getPartnerConnection(), is(partner));
 		assertFalse(executor.getAllOption());
-		assertFalse(executor.getMoreOption());
 		assertTrue(factory.isLogout());
 
 		StringBuilder out = new StringBuilder();
+
+		assertThat(toTest.toString(), is(out.toString()));
+
+	}
+
+	/**
+	 * Moreで追加レコードを取得するケース
+	 */
+	@Test public void testQueryMoreRecord() {
+		// パラメータを設定
+		String query = "select id from user";
+		parameter.put(Parameter.QUERY, query);
+		parameter.put(Parameter.SET, Parameter.Option.MORE + Parameter.Option.SIGN + "true");
+		processor.setParameter(parameter);
+
+		// 実行結果を設定
+		Map<String, String> record = new HashMap<>();
+		record.put("id", "value");
+		List<Map<String, String>> result = new LinkedList<>();
+		result.add(record);
+		executor.putResult(query, result);
+		more.setMore(result);
+
+		processor.execute();
+
+		assertTrue(factory.isLogin());
+		assertThat(executor.getPartnerConnection(), is(partner));
+		assertFalse(executor.getAllOption());
+		assertTrue(factory.isLogout());
+
+		StringBuilder out = new StringBuilder();
+		out
+		.append("id")
+		.append(System.lineSeparator())
+		.append("value")
+		.append(System.lineSeparator())
+		.append("value")
+		.append(System.lineSeparator());
 
 		assertThat(toTest.toString(), is(out.toString()));
 
