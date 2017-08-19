@@ -1,7 +1,7 @@
 package com.gmail.chibitopoochan.soqlexec.ui;
 
-import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Command.SEPARATE;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Command.QUIT;
+import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Command.SEPARATE;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Command.SET;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.ALL;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.DELIMITA;
@@ -9,14 +9,8 @@ import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Par
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.SIGN;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +38,6 @@ public class DialogProcessor extends AbstractProcessor {
 
 	// 入出力先（初期は標準入出力）
 	private InputStream in = System.in;
-	private OutputStream out = System.out;
-
-	// 列の区切り文字
-	private String separate = "|";
 
 	/**
 	 * SOQLの実行
@@ -106,24 +96,11 @@ public class DialogProcessor extends AbstractProcessor {
 			return;
 		}
 
-		try(PrintWriter writer = new PrintWriter(out)) {
-			// クエリを実行
-			List<Map<String, String>> result = getSOQLExecutor().execute(query.toString().substring(0, query.length()-1));
+		// 実行前のクエリの整備
+		setQuery(query.toString().substring(0, query.length()-1));
 
-			// 結果が空なら処理終了
-			if(result.isEmpty()) return;
-
-			// ヘッダーを出力
-			String[] headers = result.get(0).keySet().toArray(new String[0]);
-			writer.println(Arrays.stream(headers).collect(Collectors.joining(separate)));
-
-			// 行を出力
-			result.stream().map(r ->
-				Arrays.stream(headers).map(h -> r.get(h)).collect(Collectors.joining(separate))
-			).forEach(writer::println);
-
-			writer.flush();
-
+		try {
+			executeSOQL();
 		} catch (ConnectionException e) {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_010), e);
 			occurredError = true;
@@ -131,6 +108,7 @@ public class DialogProcessor extends AbstractProcessor {
 			query.setLength(0);
 			inQuery = false;
 		}
+
 	}
 
 	/**
@@ -188,14 +166,6 @@ public class DialogProcessor extends AbstractProcessor {
 	 */
 	public void setInputStream(InputStream in) {
 		this.in = in;
-	}
-
-	/**
-	 * 出力先の指定
-	 * @param out 出力先
-	 */
-	public void setOutputStream(OutputStream out) {
-		this.out = out;
 	}
 
 	/**
