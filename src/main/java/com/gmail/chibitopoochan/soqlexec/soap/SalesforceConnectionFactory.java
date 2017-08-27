@@ -32,7 +32,7 @@ public class SalesforceConnectionFactory {
 	private static Optional<SalesforceConnectionFactory> factory = Optional.empty();
 
 	public static void setSalesforceConnectionFactory(SalesforceConnectionFactory factory) {
-		SalesforceConnectionFactory.factory = Optional.of(factory);
+		SalesforceConnectionFactory.factory = Optional.ofNullable(factory);
 	}
 
 	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password) {
@@ -174,6 +174,10 @@ public class SalesforceConnectionFactory {
 		return loginResult != null;
 	}
 
+	/**
+	 * ログイン結果の設定
+	 * @param result ログイン結果
+	 */
 	public void setLoginResult(LoginResultWrapper result) {
 		this.loginResult = result;
 	}

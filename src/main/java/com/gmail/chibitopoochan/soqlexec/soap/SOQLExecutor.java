@@ -1,16 +1,20 @@
 package com.gmail.chibitopoochan.soqlexec.soap;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,7 +190,7 @@ public class SOQLExecutor {
 
 			// 残りのレコードを取得
 			QueryResultWrapper result = connection.queryMore(queryLocator);
-			List<Map<String, String>> fieldList = Arrays.stream(result.getRecords())
+			List<Map<String, String>> fieldList = Stream.of(result.getRecords())
 					.map(r -> toMapRecord(fields, r))
 					.collect(Collectors.toList());
 			logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
@@ -211,7 +215,7 @@ public class SOQLExecutor {
 	 * @return 項目と値のペア
 	 */
 	private static Map<String, String> toMapRecord(List<String> fields, SObjectWrapper record) {
-		Map<String, String> fieldMap = new HashMap<>();
+		Map<String, String> fieldMap = new LinkedHashMap<>(fields.size());
 
 		// 項目名をもとに値とのペアを作成
 		for(String field : fields) {
@@ -248,11 +252,16 @@ public class SOQLExecutor {
 	 * @return API名
 	 */
 	private static Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
-		List<XmlObjectWrapper> list = new LinkedList<>();
-		objects.forEachRemaining(i -> list.add(i));
-		Optional<String> apiName = list.stream().map(i -> i.getName().getLocalPart()).filter(i -> i.toLowerCase().equals(queryName.toLowerCase())).findFirst();
+		Optional<String> apiName =
+				StreamSupport.stream(Spliterators.spliteratorUnknownSize(objects, Spliterator.ORDERED),false)
+				.map(i -> i.getName().getLocalPart()) // ローカル名（API名）に変換
+				.filter(i -> i.toLowerCase().equals(queryName.toLowerCase())) // クエリ名と一致する場合
+				.findFirst(); // 最初に一致したAPI名を返す
+
 		logger.debug(resources.getString(Constants.Message.Information.MSG_007), queryName, apiName);
+
 		return apiName;
+
 	}
 
 }

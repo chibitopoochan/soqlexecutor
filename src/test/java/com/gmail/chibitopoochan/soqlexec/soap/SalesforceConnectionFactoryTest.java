@@ -41,6 +41,7 @@ public class SalesforceConnectionFactoryTest {
     	result.setSessionId("sessionId");
 
     	// Loginを実行
+    	SalesforceConnectionFactory.setSalesforceConnectionFactory(null);
     	factory = SalesforceConnectionFactory.newInstance(url, username, password);
     	factory.setPartnerConnection(mock);
     	factory.setLoginResult(result);

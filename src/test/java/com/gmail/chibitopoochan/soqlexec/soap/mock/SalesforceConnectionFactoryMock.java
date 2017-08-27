@@ -9,8 +9,34 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 	private boolean logout;
 	private boolean error;
 
+	private String authEndPoint;
+	private String username;
+	private String password;
+
 	public void setLoginError(boolean error) {
 		this.error = error;
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory#setParameter(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void setParameter(String authEndPoint, String username, String password) {
+		this.authEndPoint = authEndPoint;
+		this.username = username;
+		this.password = password;
+	}
+
+	public String getAuthEndPoint() {
+		return authEndPoint;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	/* (非 Javadoc)

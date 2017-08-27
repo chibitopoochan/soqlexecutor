@@ -30,6 +30,7 @@ public class SOQLExecutorTest {
 	public static final String SOQL_ALL = "select naMe from user";
 	public static final String SOQL_MORE = "Select nAme From User ";
 	public static final String SOQL_REF = "select child1.child2.child3.NamE from User";
+	public static final String SOQL_MULTI_COLUMN = "select id, username, email from user";
 
 	// 検証に使用するインスタンス
 	private PartnerConnectionWrapperMock connection;
@@ -40,6 +41,7 @@ public class SOQLExecutorTest {
 	private SObjectWrapperMock[] refRecords;
 	private SObjectWrapperMock[] moreRecords;
 	private SObjectWrapperMock[] allRecords;
+	private SObjectWrapperMock[] multiColumnRecords;
 
 	/**
 	 * 例外検証用のルールを用意
@@ -53,6 +55,23 @@ public class SOQLExecutorTest {
 		// インスタンス化
 		connection = new PartnerConnectionWrapperMock();
 		executor = new SOQLExecutor(connection);
+
+	}
+
+	private void setMultiColumnRecords() {
+		// レコードの作成
+		multiColumnRecords = new SObjectWrapperMock[1];
+		multiColumnRecords[0] = new SObjectWrapperMock();
+		multiColumnRecords[0].addChild(createColumn("email","email1"));
+		multiColumnRecords[0].addChild(createColumn("username","username1"));
+		multiColumnRecords[0].addChild(createColumn("id","id1"));
+
+		// クエリ結果を作成
+		QueryResultWrapperMock result = new QueryResultWrapperMock();
+		result.setRecords(multiColumnRecords);
+
+		// Wrapperに設定
+		connection.putSOQL(SOQL_MULTI_COLUMN, result);
 
 	}
 
@@ -336,6 +355,31 @@ public class SOQLExecutorTest {
 
 		// SOQLを実行
 		executor.execute(SOQL_NORMAL);
+
+	}
+
+	/**
+	 * 列名の整列を検証
+	 * @throws ConnectionException 接続エラー
+	 */
+	@Test public void testColumnSort() throws ConnectionException {
+		// 個別の初期化処理
+		setMultiColumnRecords();
+
+		// 接続設定
+		connection.setSuccess(true);
+
+		// SOQL実行のパラメータを設定
+		executor.setBatchSize(1);
+		executor.setAllOption(false);
+
+		// SOQLを実行
+		List<Map<String, String>> records = executor.execute(SOQL_MULTI_COLUMN);
+		String[] keys = records.get(0).keySet().toArray(new String[0]);
+
+		assertThat(keys[0], is("id"));
+		assertThat(keys[1], is("username"));
+		assertThat(keys[2], is("email"));
 
 	}
 

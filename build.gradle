@@ -10,6 +10,23 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'application'
+
+// Define the distributions setting
+mainClassName = 'com.gmail.chibitopoochan.soqlexec.ui.SOQLExecutor'
+
+distZip {
+	baseName = 'SOQLExecutor'
+}
+
+distributions {
+    main {
+        contents {
+            from { 'README.md' }
+            from { 'LICENSE' }
+        }
+    }
+}
 
 // Define the default encoding
 def defaultEncoding = 'UTF-8'

@@ -82,7 +82,7 @@ public abstract class AbstractProcessor implements Processor {
 		if(parameter.containsKey(ENV)) {
 			env = parameter.get(ENV);
 		} else {
-			env = properties.getString(Constants.Properties.UserInterface.AUTH_END_POINT);
+			env = properties.getString(Constants.Properties.AUTH_END_POINT);
 		}
 
 		// SETオプションのパラメータを取得

@@ -23,6 +23,7 @@ public class Constants {
 			public static final String ERR_010 = "ERR.010";
 			public static final String ERR_011 = "ERR.011";
 			public static final String ERR_012 = "ERR.012";
+			public static final String ERR_013 = "ERR.013";
 		}
 
 		public class Information {
@@ -45,10 +46,7 @@ public class Constants {
 
 	public class Properties {
 		public static final String RESOURCE = "Properties";
-
-		public class UserInterface {
-			public static final String AUTH_END_POINT = "authEndPoint";
-		}
+		public static final String AUTH_END_POINT = "authEndPoint";
 	}
 
 	/**
