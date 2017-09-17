@@ -54,7 +54,7 @@ public class Connector {
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password, String env) throws ConnectionException {
+	public static Connector login(String username, String password, String env) throws Exception {
 		SalesforceConnectionFactory factory =
 				SalesforceConnectionFactory.newInstance(env, username, password);
 
@@ -73,7 +73,7 @@ public class Connector {
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password) throws ConnectionException {
+	public static Connector login(String username, String password) throws Exception {
 		return Connector.login(username, password, properties.getString(Constants.Properties.AUTH_END_POINT));
 	}
 

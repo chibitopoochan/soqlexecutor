@@ -97,18 +97,13 @@ public class SOQLExecutor {
 				.matcher(soql);
 
 		// 項目が抽出できたか確認
+		// サブクエリ、集計関数は対象外（解析が複雑になるので）
 		String selectField = "";
 		if(match.matches()) {
 			selectField = match.group(1);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
-		}
-
-		// サブクエリ、集計関数は対象外（解析が複雑になるので）
-		if(selectField.contains(Constants.SOQL.SUBQUERY_LEFT_SIGN)) {
-			logger.warn(resources.getString(Constants.Message.Error.ERR_003));
-			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_003));
 		}
 
 		// 項目に分割

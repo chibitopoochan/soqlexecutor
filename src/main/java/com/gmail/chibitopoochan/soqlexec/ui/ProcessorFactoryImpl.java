@@ -22,14 +22,26 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 	private DialogProcessor dialog = new DialogProcessor();
 	private InvalidProcessor invalid = new InvalidProcessor();
 
+	/**
+	 * コマンド形式の処理を行うProcessorの設定
+	 * @param command コマンド形式の処理を行うProcessor
+	 */
 	public void setCommandProcessor(CommandProcessor command) {
 		this.command = command;
 	}
 
+	/**
+	 * 対話形式の処理を行うProcessorの設定
+	 * @param dialog 対話形式の処理を行うProcessor
+	 */
 	public void setDialog(DialogProcessor dialog) {
 		this.dialog = dialog;
 	}
 
+	/**
+	 * 処理を行わない（不正を表す）Processorの設定
+	 * @param invalid 不正を表すProcessor
+	 */
 	public void setInvalid(InvalidProcessor invalid) {
 		this.invalid  = invalid;
 	}
@@ -57,6 +69,7 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 			argPearMap.put(key, "");
 		}
 
+		// 処理するProcessorの決定
 		Processor processor = null;
 		if(!isCorrectParameter(argPearMap)) {
 			processor = invalid;
@@ -80,16 +93,21 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 		// 値が存在するか？
 		if(!argPearMap.keySet().stream().allMatch(k -> argPearMap.get(k).length() != 0)) {
 			logger.error(resources.getString(Constants.Message.Error.ERR_006));
+			logger.error(resources.getString(Constants.Message.Information.MSG_014));
 			return false;
 		}
 
 		// 存在するパラメータか？
 		if(!argPearMap.keySet().stream().allMatch(ProcessorFactoryImpl::isExistParameter)){
+			logger.error(resources.getString(Constants.Message.Error.ERR_011));
+			logger.error(resources.getString(Constants.Message.Information.MSG_014));
 			return false;
 		}
 
 		// 必須項目が存在するか
 		if(!argPearMap.containsKey(Parameter.ID) || !argPearMap.containsKey(Parameter.PWD)) {
+			logger.error(resources.getString(Constants.Message.Error.ERR_011));
+			logger.error(resources.getString(Constants.Message.Information.MSG_014));
 			return false;
 		}
 

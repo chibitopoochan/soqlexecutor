@@ -40,6 +40,7 @@ public class Constants {
 			public static final String MSG_011 = "MSG.011";
 			public static final String MSG_012 = "MSG.012";
 			public static final String MSG_013 = "MSG.013";
+			public static final String MSG_014 = "MSG.014";
 		}
 
 	}
@@ -89,7 +90,6 @@ public class Constants {
 	public class SOQL {
 		public static final String FIELD_SEPARATE_SIGN = ",";
 		public static final String FIELD_RELATION_SIGN = "\\.";
-		public static final String SUBQUERY_LEFT_SIGN = "(";
 
 		public class Pattern {
 			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,]+)\\s+from.+";

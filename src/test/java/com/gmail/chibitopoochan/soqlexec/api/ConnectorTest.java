@@ -64,7 +64,7 @@ public class ConnectorTest {
 	 * SOQLの実行
 	 * @throws ConnectionException 接続エラー
 	 */
-	@Test public void testSOQLExecute() throws ConnectionException {
+	@Test public void testSOQLExecute() throws Exception {
 		// SOQLの結果を設定
 		Map<String, String> record = new HashMap<>();
 		record.put("id", "result");
@@ -104,7 +104,7 @@ public class ConnectorTest {
 	 * 使用したい場合、再ログインする必要がある。
 	 * @throws ConnectionException 接続エラー
 	 */
-	@Test public void testOperateWithLogout() throws ConnectionException {
+	@Test public void testOperateWithLogout() throws Exception {
 
 		// ログイン
 		Connector connect = Connector.login(username, password);
@@ -116,7 +116,7 @@ public class ConnectorTest {
 		connect.logout();
 		assertTrue(factory.isLogout());
 
-		thrown.expect(ConnectionException.class);
+		thrown.expect(Exception.class);
 
 		connect.execute("", false, 10);
 

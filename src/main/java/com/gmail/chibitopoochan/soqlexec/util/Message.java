@@ -12,7 +12,7 @@ public class Message {
 	 * @return メッセージ
 	 */
 	public static String get(String key, String...parameter) {
-		return String.format(resources.getString(key).replaceAll("{}", "%s"), (Object[]) parameter);
+		return String.format(resources.getString(key).replaceAll("\\{\\}", "%s"), (Object[]) parameter);
 	}
 
 }
