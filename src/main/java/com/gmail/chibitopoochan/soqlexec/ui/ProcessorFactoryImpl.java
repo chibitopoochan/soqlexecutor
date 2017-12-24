@@ -1,5 +1,6 @@
 package com.gmail.chibitopoochan.soqlexec.ui;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter;
+import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option;
+import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Proxy;
 
 /**
  * CUI処理を振り分けるクラス
@@ -111,32 +114,51 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 			return false;
 		}
 
-		// 値の形式が正しいか？(SETのみ検証)
+		// 値の形式が正しいか？
+		// SETの検証
 		if(argPearMap.containsKey(Parameter.SET)) {
-			// SETの指定値を解析
-			String value = argPearMap.get(Parameter.SET);
-			for(String option : value.split(Parameter.Option.DELIMITA)) {
-				String[] pear = option.split(Parameter.Option.SIGN);
-
-				// ペアになっているか？
-				if(pear.length != 2){
-					logger.error(resources.getString(Constants.Message.Error.ERR_007));
-					return false;
-				}
-
-				// 存在するオプションか？
-				if(!Parameter.Option.ALL.equals(pear[0])
-						&& !Parameter.Option.MORE.equals(pear[0])) {
-					logger.error(resources.getString(Constants.Message.Error.ERR_008), pear[0]);
-					return false;
-				}
-
+			if(isInvalidOption(argPearMap.get(Parameter.SET), Option.ALL, Option.MORE)) {
+				return false;
 			}
+		}
 
+		// Proxyの検証
+		if(argPearMap.containsKey(Parameter.PROXY)) {
+			if(isInvalidOption(argPearMap.get(Parameter.PROXY), Proxy.HOST, Proxy.PORT, Proxy.ID, Proxy.PWD)) {
+				return false;
+			}
 		}
 
 		return true;
 
+	}
+
+	/**
+	 * 実行時パラメータのオプションチェック
+	 * @param value パラメータの値
+	 * @param options 有効なオプションのキーワード
+	 * @return 不正ならtrue
+	 */
+	private boolean isInvalidOption(String value, String...options) {
+		// SETの指定値を解析
+		for(String option : value.split(Parameter.Option.DELIMITA)) {
+			String[] pear = option.split(Parameter.Option.SIGN);
+
+			// ペアになっているか？
+			if(pear.length != 2){
+				logger.error(resources.getString(Constants.Message.Error.ERR_007));
+				return true;
+			}
+
+			// 存在するオプションか？
+			if(Arrays.stream(options).noneMatch(o -> o.equals(pear[0]))) {
+				logger.error(resources.getString(Constants.Message.Error.ERR_008), pear[0]);
+				return true;
+			}
+
+		}
+
+		return false;
 	}
 
 	/**
@@ -149,7 +171,8 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 				|| Parameter.PWD.equals(value)
 				|| Parameter.QUERY.equals(value)
 				|| Parameter.ENV.equals(value)
-				|| Parameter.SET.equals(value);
+				|| Parameter.SET.equals(value)
+				|| Parameter.PROXY.equals(value);
 	}
 
 }

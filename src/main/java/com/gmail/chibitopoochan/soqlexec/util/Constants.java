@@ -73,12 +73,20 @@ public class Constants {
 			public static final String QUERY	= PREFIX + "query";
 			public static final String ENV		= PREFIX + "env";
 			public static final String SET		= PREFIX + "set";
+			public static final String PROXY	= PREFIX + "proxy";
 
 			public class Option {
 				public static final String ALL = "all";
 				public static final String MORE = "more";
 				public static final String DELIMITA = ";";
 				public static final String SIGN = "=";
+			}
+
+			public class Proxy {
+				public static final String HOST = "host";
+				public static final String PORT = "port";
+				public static final String ID = "id";
+				public static final String PWD = "pwd";
 			}
 		}
 
@@ -90,9 +98,11 @@ public class Constants {
 	public class SOQL {
 		public static final String FIELD_SEPARATE_SIGN = ",";
 		public static final String FIELD_RELATION_SIGN = "\\.";
+		public static final String GROUPING_ANOTATION = "expr0";
 
 		public class Pattern {
 			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,]+)\\s+from.+";
+			public static final String COUNT_FIELDS = "select\\s+(count|sum|avg|min|max|COUNT_DISTINCT)\\([a-z0-9_.]+\\)\\s+from.+";
 		}
 	}
 

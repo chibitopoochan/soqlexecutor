@@ -9,6 +9,9 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.model.FieldMetaInfo;
+import com.gmail.chibitopoochan.soqlexec.model.SObjectMetaInfo;
+import com.gmail.chibitopoochan.soqlexec.soap.MetaInformationProvider;
 import com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor;
 import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
@@ -22,11 +25,20 @@ public class Connector {
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 	private static final ResourceBundle properties = ResourceBundle.getBundle(Constants.Properties.RESOURCE);
 
+	// Proxy情報の保持
+	private static String proxyHost;
+	private static int proxyPort;
+	private static String proxyId;
+	private static String proxyPassword;
+	private static boolean useProxy;
+
 	// 接続状態の保持
 	private Optional<SOQLExecutor.QueryMore> queryMore;
 	private SalesforceConnectionFactory factory;
 	private SOQLExecutor executor;
+	private MetaInformationProvider provider;
 	private boolean close = false;
+	private int size;
 
 	/**
 	 * Salesforceへの接続
@@ -35,6 +47,16 @@ public class Connector {
 	private Connector(SalesforceConnectionFactory factory) {
 		this.factory = factory;
 		this.executor = new SOQLExecutor(factory.getPartnerConnection());
+		this.provider = new MetaInformationProvider(factory.getPartnerConnection());
+	}
+
+	/**
+	 * メタ情報提供クラスを指定
+	 * @param provider メタ情報提供クラス
+	 */
+	public void setMetaInfoProvieder(MetaInformationProvider provider) {
+		this.provider = provider;
+		this.provider.setPartnerConnection(factory.getPartnerConnection());
 	}
 
 	/**
@@ -55,8 +77,14 @@ public class Connector {
 	 * @throws ConnectionException ログインエラー
 	 */
 	public static Connector login(String username, String password, String env) throws Exception {
-		SalesforceConnectionFactory factory =
-				SalesforceConnectionFactory.newInstance(env, username, password);
+		SalesforceConnectionFactory factory;
+
+		if(Connector.useProxy) {
+			factory = SalesforceConnectionFactory.newInstance(env, username, password
+					,Connector.proxyHost, Connector.proxyPort, Connector.proxyId, Connector.proxyPassword);
+		} else {
+			factory = SalesforceConnectionFactory.newInstance(env, username, password);
+		}
 
 		if(!factory.login()) {
 			throw new ConnectionException(Message.get(Error.ERR_001, username, password, env));
@@ -64,6 +92,21 @@ public class Connector {
 
 		return new Connector(factory);
 
+	}
+
+	/**
+	 * Proxy接続の設定
+	 * @param proxyHost ホスト名
+	 * @param proxyPort ポート番号
+	 * @param proxyId ユーザID
+	 * @param proxyPassword パスワード
+	 */
+	public static void setProxySetting(String proxyHost, int proxyPort, String proxyId, String proxyPassword) {
+		Connector.useProxy = true;
+		Connector.proxyHost = proxyHost;
+		Connector.proxyPort = proxyPort;
+		Connector.proxyId = proxyId;
+		Connector.proxyPassword = proxyPassword;
 	}
 
 	/**
@@ -98,9 +141,18 @@ public class Connector {
 		// SOQL実行
 		List<Map<String, String>> result = executor.execute(query);
 		queryMore = Optional.of(executor.getQueryMore());
+		size = executor.getSize();
 
 		return result;
 
+	}
+
+	/**
+	 * SOQLのレコード件数
+	 * @return 件数
+	 */
+	public int getSize(){
+		return size;
 	}
 
 	/**
@@ -133,6 +185,25 @@ public class Connector {
 			close = true;
 		}
 
+	}
+
+	/**
+	 * オブジェクト情報の取得
+	 * @return オブジェクト一覧
+	 * @throws ConnectionException 接続エラー
+	 */
+	public List<SObjectMetaInfo> getDescribeSObjects() throws ConnectionException {
+		return provider.getSObjectList();
+	}
+
+	/**
+	 * フィールド情報の取得
+	 * @param name SObject名
+	 * @return フィールド情報一覧
+	 * @throws ConnectionException 接続エラー
+	 */
+	public List<FieldMetaInfo> getDescribeFields(String name) throws ConnectionException {
+		return provider.getFieldList(name);
 	}
 
 }

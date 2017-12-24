@@ -30,11 +30,24 @@ public class MetaInformationProvider {
 	private PartnerConnectionWrapper connection;
 
 	/**
+	 * Salesforceへの接続を持たないインスタンスを生成
+	 */
+	public MetaInformationProvider() {}
+
+	/**
 	 * Salesforceへの接続を持ったインスタンスを生成
 	 * @param connectionWrapper Salesforceへの接続
 	 */
 	public MetaInformationProvider(PartnerConnectionWrapper connectionWrapper) {
-		this.connection = connectionWrapper;
+		setPartnerConnection(connectionWrapper);
+	}
+
+	/**
+	 * Salesforceへの接続を設定
+	 * @param partnerConnection Salesforceへの接続
+	 */
+	public void setPartnerConnection(PartnerConnectionWrapper partnerConnection) {
+		this.connection = partnerConnection;
 	}
 
 	/**

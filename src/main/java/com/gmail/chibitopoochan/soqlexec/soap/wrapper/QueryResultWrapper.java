@@ -45,6 +45,14 @@ public class QueryResultWrapper {
 	}
 
 	/**
+	 * {@link com.sforce.soap.partner.QueryResult#getSize()}をラップ
+	 * @return レコード件数
+	 */
+	public int getSize() {
+		return result.getSize();
+	}
+
+	/**
 	 * {@link com.sforce.soap.partner.QueryResult#getQueryLocator()}をラップ
 	 * @return クエリ位置
 	 */

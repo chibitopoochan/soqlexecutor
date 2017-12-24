@@ -39,6 +39,7 @@ public class SOQLExecutor {
 	private PartnerConnectionWrapper connection;
 	private QueryMore more = new QueryMore();
 	private boolean all;
+	private int size;
 
 	/**
 	 * 接続を持たないインスタンスを生成
@@ -92,15 +93,22 @@ public class SOQLExecutor {
 		}
 
 		// SELECT文から項目を抽出
-		Matcher match = Pattern
+		Matcher selectMatch = Pattern
 				.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL)
+				.matcher(soql);
+
+		// SELECT(Count)分から項目を抽出
+		Matcher countMatch = Pattern
+				.compile(Constants.SOQL.Pattern.COUNT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL)
 				.matcher(soql);
 
 		// 項目が抽出できたか確認
 		// サブクエリ、集計関数は対象外（解析が複雑になるので）
 		String selectField = "";
-		if(match.matches()) {
-			selectField = match.group(1);
+		if(selectMatch.matches()) {
+			selectField = selectMatch.group(1);
+		} else if(countMatch.matches()) {
+			selectField = Constants.SOQL.GROUPING_ANOTATION;
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
@@ -121,6 +129,8 @@ public class SOQLExecutor {
 				.collect(Collectors.toList());
 		logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
 
+		size = result.getSize();
+
 		// さらに取得する場合、ループで呼び出す
 		if(!result.isDone()) {
 			more = new QueryMore(fields, result.getQueryLocator());
@@ -137,6 +147,14 @@ public class SOQLExecutor {
 	 */
 	public QueryMore getQueryMore() {
 		return more;
+	}
+
+	/**
+	 * レコードの最大件数を取得
+	 * @return 件数
+	 */
+	public int getSize() {
+		return size;
 	}
 
 	/**
@@ -226,8 +244,8 @@ public class SOQLExecutor {
 
 				// 項目の値か参照先を取得
 				if(lastKey.equals(key)) {
-					String value = (String) (obj == null ? record.getField(apiKey) : obj.getField(apiKey));
-					fieldMap.put(field, value);
+					Object value = obj == null ? record.getField(apiKey) : obj.getField(apiKey);
+					fieldMap.put(field, value.toString());
 					logger.debug(resources.getString(Constants.Message.Information.MSG_008), field, value);
 				} else {
 					obj = obj == null ? record.getChild(apiKey) : obj.getChild(apiKey);

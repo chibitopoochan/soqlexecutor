@@ -13,7 +13,10 @@ import com.sforce.ws.ConnectionException;
 /**
  * コマンドの実行
  * <h3>コマンド形式</h3>
- * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
+ * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (ENV | OPTION | -proxy )
+ * ENV:-env [URL]
+ * OPTION:-set all=[true/false];more=[true/false]
+ * PROXY:-proxy host=[URL];port=[port];id=[id];pwd=[pwd]
  */
 public class CommandProcessor extends AbstractProcessor {
 	// クラス共通の参照
@@ -28,8 +31,18 @@ public class CommandProcessor extends AbstractProcessor {
 	@Override
 	public void execute() {
 		// SFDCへ接続
-		SalesforceConnectionFactory factory =
-				SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
+		SalesforceConnectionFactory factory;
+
+		if(isProxyConnection()) {
+			// Proxyを使用
+			factory = SalesforceConnectionFactory.newInstance(
+					getEnv(), getUsername(), getPassword(),
+					getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
+		} else {
+			factory = SalesforceConnectionFactory.newInstance(
+					getEnv(), getUsername(), getPassword());
+		}
+
 		if(!factory.login()) {
 			occurredError = true;
 			return;

@@ -5,6 +5,7 @@ import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Par
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.PWD;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.QUERY;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.SET;
+import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.PROXY;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option;
+import com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Proxy;
 import com.sforce.ws.ConnectionException;
 
 public abstract class AbstractProcessor implements Processor {
@@ -35,6 +37,11 @@ public abstract class AbstractProcessor implements Processor {
 	private String env;
 	private boolean more;
 	private boolean all;
+	private boolean useProxy;
+	private String proxyHost;
+	private int proxyPort;
+	private String proxyUsername;
+	private String proxyPassword;
 
 	// SOQLの実行クラス
 	private SOQLExecutor executor;
@@ -100,7 +107,32 @@ public abstract class AbstractProcessor implements Processor {
 			}
 		}
 
-		logger.info(resources.getString(Constants.Message.Information.MSG_010), username, password, env, soql, all, more);
+		// Proxyオプションのパラメータを取得
+		if(parameter.containsKey(PROXY)) {
+			useProxy = true;
+			String options = parameter.get(PROXY);
+			String[] option = options.split(Option.DELIMITA);
+			for(String s : option) {
+				String[] values = s.split(Option.SIGN);
+				if(Proxy.HOST.equals(values[0])){
+					proxyHost = values[1];
+				}
+				if(Proxy.PORT.equals(values[0])) {
+					proxyPort = Integer.parseInt(values[1]);
+				}
+				if(Proxy.ID.equals(values[0])) {
+					proxyUsername = values[1];
+				}
+				if(Proxy.PWD.equals(values[0])) {
+					proxyPassword = values[1];
+				}
+
+			}
+		}
+
+		logger.info(resources.getString(Constants.Message.Information.MSG_010),
+				username, password, env, soql, all, more,
+				proxyHost+":"+proxyPort+" " + proxyUsername + "/" + proxyPassword);
 
 	}
 
@@ -230,6 +262,46 @@ public abstract class AbstractProcessor implements Processor {
 	 */
 	protected SOQLExecutor getSOQLExecutor() {
 		return executor;
+	}
+
+	/**
+	 * Proxyの使用
+	 * @return 使用ならtrue
+	 */
+	protected boolean isProxyConnection() {
+		return useProxy;
+	}
+
+	/**
+	 * Proxyホスト名の取得
+	 * @return Proxyホスト名
+	 */
+	protected String getProxyHost() {
+		return proxyHost;
+	}
+
+	/**
+	 * Proxyポートの取得
+	 * @return ポート番号
+	 */
+	protected int getProxyPort() {
+		return proxyPort;
+	}
+
+	/**
+	 * PROXYユーザ名の取得
+	 * @return Proxyのユーザ名
+	 */
+	protected String getProxyUsername() {
+		return proxyUsername;
+	}
+
+	/**
+	 * PROXYパスワードの取得
+	 * @return Proxyのパスワード
+	 */
+	protected String getProxyPassword() {
+		return proxyPassword;
 	}
 
 }

@@ -25,7 +25,10 @@ import com.gmail.chibitopoochan.soqlexec.util.Constants.Message.Information;
 /**
  * 対話形式でSOQLを実行.
  * <h3>対話形式</h3>
- * SOQLExecutor -id [username] -pwd [password] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
+ * SOQLExecutor -id [username] -pwd [password] (ENV | OPTION | -proxy )
+ * ENV:-env [URL]
+ * OPTION:-set all=[true/false];more=[true/false]
+ * PROXY:-proxy host=[URL];port=[port];id=[id];pwd=[pwd]
  */
 public class DialogProcessor extends AbstractProcessor {
 	// 入力待ちの記号
@@ -54,8 +57,14 @@ public class DialogProcessor extends AbstractProcessor {
 
 		// SFDCへ接続
 		writer.println(resources.getString(Information.MSG_012));
-		SalesforceConnectionFactory factory =
-				SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
+		SalesforceConnectionFactory factory;
+		if(isProxyConnection()) {
+			// Proxyを使用
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(),
+					getProxyHost(), getProxyPort(), getProxyUsername(), getPassword());
+		} else {
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
+		}
 		if(!factory.login()) {
 			occurredError = true;
 			return;

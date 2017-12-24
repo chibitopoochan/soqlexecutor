@@ -15,6 +15,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.gmail.chibitopoochan.soqlexec.api.mock.MetaInformationProviderMock;
+import com.gmail.chibitopoochan.soqlexec.model.FieldMetaInfo;
+import com.gmail.chibitopoochan.soqlexec.model.SObjectMetaInfo;
 import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PartnerConnectionWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SOQLExecutorMock;
@@ -96,6 +99,29 @@ public class ConnectorTest {
 		connect.logout();
 		assertTrue(factory.isLogout());
 
+	}
+
+	/**
+	 * メタ情報を取得.
+	 * @throws Exception 接続エラー
+	 */
+	@Test public void testDescribeSObject() throws Exception {
+		List<SObjectMetaInfo> obj = new LinkedList<>();
+		obj.add(new SObjectMetaInfo("name", "lable", "prefix"));
+
+		List<FieldMetaInfo> field = new LinkedList<>();
+		field.add(new FieldMetaInfo("name", "label", 100, "type"));
+
+		MetaInformationProviderMock provider = new MetaInformationProviderMock();
+		provider.setSObjectList(obj);
+		provider.setFieldList(field);
+
+		// ログイン
+		Connector connect = Connector.login(username, password);
+		connect.setMetaInfoProvieder(provider);
+
+		assertThat(connect.getDescribeSObjects(), is(obj));
+		assertThat(connect.getDescribeFields(""), is(field));
 	}
 
 	/**

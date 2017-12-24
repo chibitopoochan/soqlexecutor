@@ -5,10 +5,10 @@ package com.gmail.chibitopoochan.soqlexec.ui;
  * SOQLを一回実行して終わるコマンド形式とユーザ入力でSOQLを実行する対話形式がある。
  *
  * <h3>コマンド形式</h3>
- * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
+ * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (-proxy host=[id];port=[port];id=[username];pwd=[password] | -env URL | -set OPTION=VALUE;OPTION=VALUE...)
  *
  * <h3>対話形式</h3>
- * SOQLExecutor -id [username] -pwd [password] (-env URL | -set OPTION=VALUE;OPTION=VALUE...)
+ * SOQLExecutor -id [username] -pwd [password] (-proxy host=[id];port=[port];id=[username];pwd=[password] | -env URL | -set OPTION=VALUE;OPTION=VALUE...)
  *
  * <h3>パラメータ</h3>
  * id:ユーザ名
@@ -16,6 +16,7 @@ package com.gmail.chibitopoochan.soqlexec.ui;
  * query:実行するSOQL
  * env:ログイン先のURL
  * set:MORE,ALLの指定。デフォルトはfalse
+ * proxy:プロキシ接続情報
  *
  * <h3>対話形式のコマンド群</h3>
  * "quit" 終了

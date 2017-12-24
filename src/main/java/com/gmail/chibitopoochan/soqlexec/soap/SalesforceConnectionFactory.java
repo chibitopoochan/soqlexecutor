@@ -31,12 +31,41 @@ public class SalesforceConnectionFactory {
 	// 自身のインスタンス
 	private static Optional<SalesforceConnectionFactory> factory = Optional.empty();
 
+	/**
+	 * 自身のインスタンスの設定
+	 * @param factory Singletonパターンで提供するインスタンス
+	 */
 	public static void setSalesforceConnectionFactory(SalesforceConnectionFactory factory) {
 		SalesforceConnectionFactory.factory = Optional.ofNullable(factory);
 	}
 
+	/**
+	 * インスタンスの取得
+	 * @param authEndPoint 認証先（URL）
+	 * @param username ユーザ名
+	 * @param password パスワード
+	 * @return インスタンス
+	 */
 	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password) {
 		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password));
+	}
+
+	/**
+	 * インスタンスの取得
+	 * @param authEndPoint 認証先（URL）
+	 * @param username ユーザ名
+	 * @param password パスワード
+	 * @param proxyServer プロキシサーバのホスト名
+	 * @param proxyPort プロキシサーバのポート
+	 * @param proxyUser プロキシサーバのユーザ名
+	 * @param proxyPassword プロキシサーバのパスワード
+	 * @return インスタンス
+	 */
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password
+			,String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
+		return factory.orElse(
+				new SalesforceConnectionFactory(authEndPoint, username, password,
+						proxyServer, proxyPort, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -52,7 +81,22 @@ public class SalesforceConnectionFactory {
 	 */
 	private SalesforceConnectionFactory(String authEndPoint, String username, String password) {
 		setParameter(authEndPoint, username, password);
+	}
 
+	/**
+	 * 接続情報を持つコネクタを作成します
+	 * @param authEndPoint 認証先URL
+	 * @param username ユーザ名
+	 * @param password パスワード
+	 * @param proxyServer プロキシサーバのホスト名
+	 * @param proxyPort プロキシサーバのポート
+	 * @param proxyUser プロキシサーバのユーザ名
+	 * @param proxyPassword プロキシサーバのパスワード
+	 */
+	private SalesforceConnectionFactory(String authEndPoint, String username, String password
+			, String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
+		this(authEndPoint, username, password);
+		setProxyParameter(proxyServer, proxyPort, proxyUser, proxyPassword);
 	}
 
 	/**
@@ -70,6 +114,20 @@ public class SalesforceConnectionFactory {
 
         this.username = username;
         this.password = password;
+
+	}
+
+	/**
+	 * プロキシ情報を設定
+	 * @param host プロキシサーバのホスト
+	 * @param port プロキシサーバのポート
+	 * @param username ユーザ名
+	 * @param password パスワード
+	 */
+	public void setProxyParameter(String host, int port, String username, String password) {
+        config.setProxy(host, port);
+        config.setProxyUsername(username);
+        config.setProxyPassword(password);
 
 	}
 

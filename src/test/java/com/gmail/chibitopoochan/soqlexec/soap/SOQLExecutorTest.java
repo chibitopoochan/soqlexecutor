@@ -69,6 +69,7 @@ public class SOQLExecutorTest {
 		// クエリ結果を作成
 		QueryResultWrapperMock result = new QueryResultWrapperMock();
 		result.setRecords(multiColumnRecords);
+		result.setSize(1);
 
 		// Wrapperに設定
 		connection.putSOQL(SOQL_MULTI_COLUMN, result);
@@ -87,6 +88,7 @@ public class SOQLExecutorTest {
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
 		normalResult.setRecords(normalRecords);
+		normalResult.setSize(1);
 
 		// Wrapperに設定
 		connection.putSOQL(SOQL_NORMAL, normalResult);
@@ -117,6 +119,7 @@ public class SOQLExecutorTest {
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
 		normalResult.setRecords(refRecords);
+		normalResult.setSize(1);
 
 		// Wrapperに設定
 		connection.putSOQL(SOQL_REF, normalResult);
@@ -137,6 +140,7 @@ public class SOQLExecutorTest {
 		normalResult.setRecords(normalRecords);
 		normalResult.setDone(false);
 		normalResult.setQueryLocator("locator");
+		normalResult.setSize(2);
 
 		// 追加レコードの作成
 		moreRecords = new SObjectWrapperMock[1];
@@ -148,6 +152,7 @@ public class SOQLExecutorTest {
 		moreResult.setRecords(moreRecords);
 		moreResult.setQueryLocator("locator");
 		moreResult.setDone(true);
+		moreResult.setSize(2);
 
 		// Wrapperに設定
 		connection.putSOQL(SOQL_MORE, normalResult);
@@ -167,6 +172,7 @@ public class SOQLExecutorTest {
 		// クエリ結果の作成
 		QueryResultWrapperMock allResult = new QueryResultWrapperMock();
 		allResult.setRecords(allRecords);
+		allResult.setSize(1);
 
 		// Wrapperに設定
 		connection.putSOQLAll(SOQL_ALL, allResult);

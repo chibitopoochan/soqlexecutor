@@ -1,5 +1,6 @@
 package com.gmail.chibitopoochan.soqlexec.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -11,8 +12,8 @@ public class FieldMetaInfo {
 	private String label;
 	private int length;
 	private String type;
-	private List<String> picklist;
-	private List<String> referenceToList;
+	private List<String> picklist = new LinkedList<>();
+	private List<String> referenceToList = new LinkedList<>();
 
 	/**
 	 * 初期値を持つメタ情報を生成
