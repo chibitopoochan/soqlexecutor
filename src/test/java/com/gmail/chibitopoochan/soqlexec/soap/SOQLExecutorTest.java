@@ -238,7 +238,7 @@ public class SOQLExecutorTest {
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 
 		// 項目の値を取得できること
-		assertThat(records.get(0).get("namE"), is((String)normalRecords[0].getField("Name")));
+		assertThat(records.get(0).get("namE"), is((String)normalRecords[0].getField("Name").get()));
 
 	}
 
@@ -267,7 +267,7 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
-		assertThat(records.get(0).get("naMe"), is(allRecords[0].getField("name")));
+		assertThat(records.get(0).get("naMe"), is(allRecords[0].getField("name").get()));
 	}
 
 	/**
@@ -300,9 +300,9 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
-		assertThat(records.get(0).get("nAme"), is(normalRecords[0].getField("name")));
+		assertThat(records.get(0).get("nAme"), is(normalRecords[0].getField("name").get()));
 		assertThat(Integer.valueOf(moreList.size()), is(Integer.valueOf(1)));
-		assertThat(moreList.get(0).get("nAme"), is(moreRecords[0].getField("name")));
+		assertThat(moreList.get(0).get("nAme"), is(moreRecords[0].getField("name").get()));
 	}
 
 	/**
@@ -331,10 +331,10 @@ public class SOQLExecutorTest {
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 		assertNotNull(refRecords[0].getChild("child1"));
-		assertNotNull(refRecords[0].getChild("child1").getChild("child2"));
-		assertNotNull(refRecords[0].getChild("child1").getChild("child2").getChild("child3"));
+		assertNotNull(refRecords[0].getChild("child1").get().getChild("child2"));
+		assertNotNull(refRecords[0].getChild("child1").get().getChild("child2").get().getChild("child3"));
 		assertThat(records.get(0).get("child1.child2.child3.NamE"),
-				is(refRecords[0].getChild("child1").getChild("child2").getChild("child3").getField("name")));
+				is(refRecords[0].getChild("child1").get().getChild("child2").get().getChild("child3").get().getField("name").get()));
 
 	}
 

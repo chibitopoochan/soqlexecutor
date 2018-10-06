@@ -90,6 +90,8 @@ public class Connector {
 			throw new ConnectionException(Message.get(Error.ERR_001, username, password, env));
 		}
 
+		Connector.resetProxySetting();
+
 		return new Connector(factory);
 
 	}
@@ -107,6 +109,24 @@ public class Connector {
 		Connector.proxyPort = proxyPort;
 		Connector.proxyId = proxyId;
 		Connector.proxyPassword = proxyPassword;
+		logger.info("set proxy setting");
+		logger.info(String.format("useProxy=[%s]",useProxy));
+		logger.info(String.format("useHost=[%s]",proxyHost));
+		logger.info(String.format("usePort=[%s]",proxyPort));
+		logger.info(String.format("useId=[%s]",proxyId));
+		logger.info(String.format("usePassword=[%s]",proxyPassword));
+	}
+
+	/**
+	 * Proxy接続の設定解除
+	 */
+	public static void resetProxySetting() {
+		Connector.useProxy = true;
+		Connector.proxyHost = null;
+		Connector.proxyPort = 0;
+		Connector.proxyId = null;
+		Connector.proxyPassword = null;
+
 	}
 
 	/**

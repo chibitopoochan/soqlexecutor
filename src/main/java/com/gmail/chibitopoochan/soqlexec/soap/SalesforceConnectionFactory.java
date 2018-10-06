@@ -63,9 +63,10 @@ public class SalesforceConnectionFactory {
 	 */
 	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password
 			,String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
-		return factory.orElse(
-				new SalesforceConnectionFactory(authEndPoint, username, password,
-						proxyServer, proxyPort, proxyUser, proxyPassword));
+		SalesforceConnectionFactory value = factory.orElse(
+				new SalesforceConnectionFactory(authEndPoint, username, password));
+		value.setProxyParameter(proxyServer, proxyPort, proxyUser, proxyPassword);
+		return value;
 	}
 
 	/**
@@ -81,22 +82,6 @@ public class SalesforceConnectionFactory {
 	 */
 	private SalesforceConnectionFactory(String authEndPoint, String username, String password) {
 		setParameter(authEndPoint, username, password);
-	}
-
-	/**
-	 * 接続情報を持つコネクタを作成します
-	 * @param authEndPoint 認証先URL
-	 * @param username ユーザ名
-	 * @param password パスワード
-	 * @param proxyServer プロキシサーバのホスト名
-	 * @param proxyPort プロキシサーバのポート
-	 * @param proxyUser プロキシサーバのユーザ名
-	 * @param proxyPassword プロキシサーバのパスワード
-	 */
-	private SalesforceConnectionFactory(String authEndPoint, String username, String password
-			, String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
-		this(authEndPoint, username, password);
-		setProxyParameter(proxyServer, proxyPort, proxyUser, proxyPassword);
 	}
 
 	/**

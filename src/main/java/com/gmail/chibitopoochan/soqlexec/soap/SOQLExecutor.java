@@ -19,9 +19,9 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.sforce.ws.ConnectionException;
@@ -227,7 +227,7 @@ public class SOQLExecutor {
 	 * @param record 検索結果
 	 * @return 項目と値のペア
 	 */
-	private static Map<String, String> toMapRecord(List<String> fields, SObjectWrapper record) {
+	private static Map<String, String> toMapRecord(List<String> fields, ObjectWrapper record) {
 		Map<String, String> fieldMap = new LinkedHashMap<>(fields.size());
 
 		// 項目名をもとに値とのペアを作成
@@ -236,19 +236,19 @@ public class SOQLExecutor {
 			String lastKey = keys.get(keys.size()-1);
 
 			// SOQLで参照を経由している場合、経由先を辿る
-			XmlObjectWrapper obj = null;
+			Optional<ObjectWrapper> obj = Optional.empty();
 			for(String key : keys) {
 				// API名を取得
-				Iterator<XmlObjectWrapper> children = obj == null ? record.getChildren() : obj.getChildren();
+				Iterator<XmlObjectWrapper> children = obj.orElse(record).getChildren();
 				String apiKey = toAPIName(children, key).orElse(key);
 
 				// 項目の値か参照先を取得
 				if(lastKey.equals(key)) {
-					Object value = obj == null ? record.getField(apiKey) : obj.getField(apiKey);
-					fieldMap.put(field, value.toString());
+					Optional<Object> value = obj.orElse(record).getField(apiKey);
+					fieldMap.put(field, value.orElse("").toString());
 					logger.debug(resources.getString(Constants.Message.Information.MSG_008), field, value);
 				} else {
-					obj = obj == null ? record.getChild(apiKey) : obj.getChild(apiKey);
+					obj = obj.orElse(record).getChild(apiKey);
 				}
 			}
 

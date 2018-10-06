@@ -3,14 +3,16 @@ package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.sforce.soap.partner.sobject.SObject;
 
 /**
  * SalesforceAPIのラップ.
  * 実API呼び出しを分離して依存を下げます。
+ * Nullの可能性がある項目はOptionalで返します。
  */
-public class SObjectWrapper {
+public class SObjectWrapper implements ObjectWrapper {
 	private SObject result;
 
 	/**
@@ -39,8 +41,8 @@ public class SObjectWrapper {
 	 * @param name 項目名
 	 * @return 参照先オブジェクト
 	 */
-	public XmlObjectWrapper getChild(String name) {
-		return new XmlObjectWrapper(result.getChild(name));
+	public Optional<ObjectWrapper> getChild(String name) {
+		return Optional.of(result.getChild(name)).map(c -> (ObjectWrapper)new XmlObjectWrapper(c));
 	}
 
 	/**
@@ -48,8 +50,8 @@ public class SObjectWrapper {
 	 * @param name 項目名
 	 * @return 値
 	 */
-	public Object getField(String name) {
-		return result.getField(name);
+	public Optional<Object> getField(String name) {
+		return Optional.ofNullable(result.getField(name));
 	}
 
 	/**
@@ -74,7 +76,7 @@ public class SObjectWrapper {
 	 * {@link com.sforce.soap.partner.sobject.SObject#getValue()}をラップ
 	 * @return 値
 	 */
-	public Object getValue() {
-		return result.getValue();
+	public Optional<Object> getValue() {
+		return Optional.ofNullable(result.getValue());
 	}
 }

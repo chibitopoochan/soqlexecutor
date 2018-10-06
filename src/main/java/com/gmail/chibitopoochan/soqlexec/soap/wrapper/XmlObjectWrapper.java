@@ -3,14 +3,16 @@ package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.sforce.ws.bind.XmlObject;
 
 /**
  * SalesforceAPIのラップ.
  * 実API呼び出しを分離して依存を下げます。
+ * Nullの可能性がある項目はOptionalで返します。
  */
-public class XmlObjectWrapper {
+public class XmlObjectWrapper implements ObjectWrapper {
 	private XmlObject result;
 
 	/**
@@ -34,46 +36,44 @@ public class XmlObjectWrapper {
 		this.result = result;
 	}
 
-	/**
-	 * {@link com.sforce.ws.bind.XmlObject#getChild(String)}をラップ
-	 * @param name 項目名
-	 * @return 参照先のオブジェクト
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getChild(java.lang.String)
 	 */
-	public XmlObjectWrapper getChild(String name) {
-		return new XmlObjectWrapper(result.getChild(name));
+	@Override
+	public Optional<ObjectWrapper> getChild(String name) {
+		return Optional.of(result.getChild(name)).map(c -> new XmlObjectWrapper(c));
 	}
 
-	/**
-	 * {@link com.sforce.ws.bind.XmlObject#getField(String)}をラップ
-	 * @param name 項目名
-	 * @return 値
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getField(java.lang.String)
 	 */
-	public Object getField(String name) {
-		return result.getField(name);
+	@Override
+	public Optional<Object> getField(String name) {
+		return Optional.ofNullable(result.getField(name));
 	}
 
-	/**
-	 * {@link com.sforce.soap.partner.sobject.SObject#getChildren()}をラップ
-	 * @return 子要素一覧
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getChildren()
 	 */
+	@Override
 	public Iterator<XmlObjectWrapper> getChildren() {
 		List<XmlObjectWrapper> children = new LinkedList<>();
 		result.getChildren().forEachRemaining(c -> children.add(new XmlObjectWrapper(c)));
 		return children.iterator();
 	}
 
-	/**
-	 * {@link com.sforce.soap.partner.sobject.SObject#getValue()}をラップ
-	 * @return 値
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getValue()
 	 */
-	public Object getValue() {
-		return result.getValue();
+	@Override
+	public Optional<Object> getValue() {
+		return Optional.ofNullable(result.getValue());
 	}
 
-	/**
-	 * {@link com.sforce.ws.bind.XmlObject#getName()}をラップ
-	 * @return 名前
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getName()
 	 */
+	@Override
 	public QNameWrapper getName() {
 		return new QNameWrapper(result.getName());
 	}

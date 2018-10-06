@@ -12,6 +12,10 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 	private String authEndPoint;
 	private String username;
 	private String password;
+	private String proxyHost;
+	private int proxyPort;
+	private String proxyUser;
+	private String proxyPass;
 
 	public void setLoginError(boolean error) {
 		this.error = error;
@@ -87,6 +91,45 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 
 	public void setPartnerConnection(PartnerConnectionWrapper partner) {
 		this.partner = partner;
+	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory#setProxyParameter(java.lang.String, int, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void setProxyParameter(String host, int port, String username, String password) {
+		proxyHost = host;
+		proxyPort = port;
+		proxyUser = username;
+		proxyPass = password;
+	}
+
+	/**
+	 * @return proxyHost
+	 */
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	/**
+	 * @return proxyPort
+	 */
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	/**
+	 * @return proxyUser
+	 */
+	public String getProxyUser() {
+		return proxyUser;
+	}
+
+	/**
+	 * @return proxyPass
+	 */
+	public String getProxyPass() {
+		return proxyPass;
 	}
 
 }

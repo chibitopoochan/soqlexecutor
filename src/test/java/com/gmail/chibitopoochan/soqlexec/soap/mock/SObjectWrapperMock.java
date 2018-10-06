@@ -3,7 +3,9 @@ package com.gmail.chibitopoochan.soqlexec.soap.mock;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QNameWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
@@ -21,19 +23,19 @@ public class SObjectWrapperMock extends SObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper#getValue()
 	 */
 	@Override
-	public Object getValue() {
-		return value;
+	public Optional<Object> getValue() {
+		return Optional.ofNullable(value);
 	}
 
 	/* (非 Javadoc)
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper#getField(java.lang.String)
 	 */
 	@Override
-	public Object getField(String name) {
+	public Optional<Object> getField(String name) {
 		if(childMap.containsKey(name)) {
 			return childMap.get(name).getValue();
 		} else {
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -53,8 +55,8 @@ public class SObjectWrapperMock extends SObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper#getChild(java.lang.String)
 	 */
 	@Override
-	public XmlObjectWrapper getChild(String name) {
-		return childMap.get(name);
+	public Optional<ObjectWrapper> getChild(String name) {
+		return Optional.ofNullable(childMap.get(name));
 	}
 
 	public void setName(QNameWrapper name){

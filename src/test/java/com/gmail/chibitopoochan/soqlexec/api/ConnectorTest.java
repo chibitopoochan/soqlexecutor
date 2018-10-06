@@ -1,6 +1,7 @@
 package com.gmail.chibitopoochan.soqlexec.api;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -145,6 +146,44 @@ public class ConnectorTest {
 		thrown.expect(Exception.class);
 
 		connect.execute("", false, 10);
+
+	}
+
+	/**
+	 * プロキシを用いた接続.
+	 * プロキシ設定がパラメターとして受け渡されることを確認する。
+	 * @throws Exception 接続エラー
+	 */
+	@Test public void testProxySetting() throws Exception {
+		String proxyHost = "host";
+		int proxyPort = 8080;
+		String proxyId = "user";
+		String proxyPassword = "password";
+
+		// ログイン
+		Connector.setProxySetting(proxyHost, proxyPort, proxyId, proxyPassword);
+		Connector.login(username, password);
+
+		assertThat(factory.getProxyHost(), is(proxyHost));
+		assertThat(factory.getProxyPort(), is(proxyPort));
+		assertThat(factory.getProxyUser(), is(proxyId));
+		assertThat(factory.getProxyPass(), is(proxyPassword));
+
+		// 再ログイン（プロキシ設定の指定が無ければ通常ログイン）
+		Connector.login(username, password);
+		assertThat(factory.getProxyHost(), nullValue());
+		assertThat(factory.getProxyPort(), is(0));
+		assertThat(factory.getProxyUser(), nullValue());
+		assertThat(factory.getProxyPass(), nullValue());
+
+		// 再ログイン（プロキシ設定の指定があればプロキシ接続）
+		Connector.setProxySetting(proxyHost, proxyPort, proxyId, proxyPassword);
+		Connector.login(username, password);
+
+		assertThat(factory.getProxyHost(), is(proxyHost));
+		assertThat(factory.getProxyPort(), is(proxyPort));
+		assertThat(factory.getProxyUser(), is(proxyId));
+		assertThat(factory.getProxyPass(), is(proxyPassword));
 
 	}
 
