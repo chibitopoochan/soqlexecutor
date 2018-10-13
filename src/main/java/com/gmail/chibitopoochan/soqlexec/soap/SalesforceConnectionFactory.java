@@ -210,6 +210,13 @@ public class SalesforceConnectionFactory {
 	}
 
 	/**
+	 * インスタンス参照の削除
+	 */
+	public void removeInstance() {
+		factory = Optional.empty();
+	}
+
+	/**
 	 * ログイン状態の取得
 	 * @return ログインならtrue
 	 */

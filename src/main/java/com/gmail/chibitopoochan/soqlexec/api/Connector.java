@@ -202,6 +202,7 @@ public class Connector {
 	public void logout() {
 		if(!close) {
 			factory.logout();
+			factory.removeInstance();
 			close = true;
 		}
 
