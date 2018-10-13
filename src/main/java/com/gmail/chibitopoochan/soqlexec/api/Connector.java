@@ -121,7 +121,7 @@ public class Connector {
 	 * Proxy接続の設定解除
 	 */
 	public static void resetProxySetting() {
-		Connector.useProxy = true;
+		Connector.useProxy = false;
 		Connector.proxyHost = null;
 		Connector.proxyPort = 0;
 		Connector.proxyId = null;
