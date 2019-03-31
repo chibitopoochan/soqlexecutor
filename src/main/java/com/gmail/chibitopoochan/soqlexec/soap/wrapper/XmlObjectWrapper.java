@@ -41,7 +41,7 @@ public class XmlObjectWrapper implements ObjectWrapper {
 	 */
 	@Override
 	public Optional<ObjectWrapper> getChild(String name) {
-		return Optional.of(result.getChild(name)).map(c -> new XmlObjectWrapper(c));
+		return Optional.ofNullable(result.getChild(name)).map(c -> new XmlObjectWrapper(c));
 	}
 
 	/* (非 Javadoc)

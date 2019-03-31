@@ -42,7 +42,7 @@ public class SObjectWrapper implements ObjectWrapper {
 	 * @return 参照先オブジェクト
 	 */
 	public Optional<ObjectWrapper> getChild(String name) {
-		return Optional.of(result.getChild(name)).map(c -> (ObjectWrapper)new XmlObjectWrapper(c));
+		return Optional.ofNullable(result.getChild(name)).map(c -> (ObjectWrapper)new XmlObjectWrapper(c));
 	}
 
 	/**

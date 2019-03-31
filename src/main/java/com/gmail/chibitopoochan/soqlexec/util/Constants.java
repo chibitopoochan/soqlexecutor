@@ -98,11 +98,13 @@ public class Constants {
 	public class SOQL {
 		public static final String FIELD_SEPARATE_SIGN = ",";
 		public static final String FIELD_RELATION_SIGN = "\\.";
-		public static final String GROUPING_ANOTATION = "expr0";
+		public static final String GROUPING_ANOTATION = "expr";
 
 		public class Pattern {
-			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,]+)\\s+from.+";
-			public static final String COUNT_FIELDS = "select\\s+(count|sum|avg|min|max|COUNT_DISTINCT)\\([a-z0-9_.]+\\)\\s+from.+";
+			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,\\(\\)]+)\\s+from.+";
+			public static final String FROM_FIELD = "\\s+from\\s+([a-z_]+)";
+			public static final String COUNT_FIELDS = "([a-z_]+)\\([a-z0-9_.]+\\)";
+			public static final String QUERY_FIELDS = "[^a-z_]+\\((.+)\\)";
 		}
 	}
 

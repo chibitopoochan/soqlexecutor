@@ -1,6 +1,7 @@
 package com.gmail.chibitopoochan.soqlexec.soap;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -40,6 +41,11 @@ public class SOQLExecutor {
 	private QueryMore more = new QueryMore();
 	private boolean all;
 	private int size;
+	private Map<String, String> subqueryMap = new HashMap<>();
+	private Pattern selectPattern = Pattern.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern countPattern = Pattern.compile(Constants.SOQL.Pattern.COUNT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern subqueryPattern = Pattern.compile(Constants.SOQL.Pattern.QUERY_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern formPattern = Pattern.compile(Constants.SOQL.Pattern.FROM_FIELD, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 
 	/**
 	 * 接続を持たないインスタンスを生成
@@ -88,37 +94,10 @@ public class SOQLExecutor {
 	 */
 	public List<Map<String, String>> execute(String soql) throws ConnectionException {
 		// パラメータをログ出力
-		if(logger.isInfoEnabled()) {
-			logger.info(resources.getString(Constants.Message.Information.MSG_005), soql, connection.getQueryOption(), all);
-		}
+		logger.info(resources.getString(Constants.Message.Information.MSG_005), soql, connection.getQueryOption(), all);
 
-		// SELECT文から項目を抽出
-		Matcher selectMatch = Pattern
-				.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL)
-				.matcher(soql);
-
-		// SELECT(Count)分から項目を抽出
-		Matcher countMatch = Pattern
-				.compile(Constants.SOQL.Pattern.COUNT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL)
-				.matcher(soql);
-
-		// 項目が抽出できたか確認
-		// サブクエリ、集計関数は対象外（解析が複雑になるので）
-		String selectField = "";
-		if(selectMatch.matches()) {
-			selectField = selectMatch.group(1);
-		} else if(countMatch.matches()) {
-			selectField = Constants.SOQL.GROUPING_ANOTATION;
-		} else {
-			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
-			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
-		}
-
-		// 項目に分割
-		List<String> fields = Arrays
-				.stream(selectField.split(Constants.SOQL.FIELD_SEPARATE_SIGN))
-				.map(f -> f.trim())
-				.collect(Collectors.toList());
+		// 項目を抽出
+		List<String> fields = extractFields(soql);
 
 		// SOQLを発行
 		QueryResultWrapper result = all ? connection.queryAll(soql) : connection.query(soql);
@@ -155,6 +134,95 @@ public class SOQLExecutor {
 	 */
 	public int getSize() {
 		return size;
+	}
+
+	/**
+	 * SELECT文から項目名を抽出
+	 * @param soql SELECT文のSOQL
+	 * @return 項目一覧
+	 */
+	private List<String> extractFields(String soql) {
+		// SELECT文から項目を抽出
+		Matcher selectMatch = selectPattern.matcher(soql);
+
+		// 項目が抽出できたか確認
+		String selectField = "";
+		if(selectMatch.matches()) {
+			// 集計項目の置き換え
+			selectField = replaceCount(selectMatch.group(1));
+			// サブクエリの置き換え
+			selectField = replaceSubquery(selectField);
+		} else {
+			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
+			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
+		}
+
+		// 項目に分割
+		return Arrays
+				.stream(selectField.split(Constants.SOQL.FIELD_SEPARATE_SIGN))
+				.map(f -> f.trim())
+				.collect(Collectors.toList());
+
+	}
+
+	/**
+	 * サブクエリを仮項目名に置換<br>
+	 * 実行結果の取得用にクエリをリレーション名に仮置きする。
+	 * @param selectField 取得項目の文字列
+	 * @return 置換後の取得項目
+	 */
+	private String replaceSubquery(String selectField) {
+		// 項目からサブクエリを抽出
+		Matcher subqueryMatch = subqueryPattern.matcher(selectField);
+
+		// サブクエリをリレーション名に置換
+		StringBuffer workSelectField = new StringBuffer();
+		int counter = 1;
+		while(subqueryMatch.find()) {
+			// リレーション名に置き換え
+			String subquery = subqueryMatch.group(counter);
+			Matcher formMatch = formPattern.matcher(subquery);
+			if(!formMatch.find()) {
+				logger.warn(resources.getString(Constants.Message.Error.ERR_004), subquery);
+				throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", subquery));
+			}
+			String relationName = formMatch.group(1);
+			subqueryMatch.appendReplacement(workSelectField, ","+relationName);
+
+			// リレーション名とサブクエリの項目を記録
+			Matcher selectMatch = selectPattern.matcher(subquery);
+			if(!selectMatch.find()) {
+				logger.warn(resources.getString(Constants.Message.Error.ERR_004), subquery);
+				throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", subquery));
+			}
+			subqueryMap.put(relationName, selectMatch.group());
+
+		}
+		subqueryMatch.appendTail(workSelectField);
+
+		return workSelectField.toString();
+
+	}
+
+	/**
+	 * 集計項目を仮項目名に置換
+	 * @param selectField 取得項目の文字列
+	 * @return 置換後の取得項目
+	 */
+	private String replaceCount(String selectField) {
+		// 項目から集計項目を抽出
+		Matcher countMatch = countPattern.matcher(selectField);
+
+		// 集計項目用の列名に置き換え
+		StringBuffer workSelectField = new StringBuffer();
+		int counter = 0;
+		while(countMatch.find()) {
+			countMatch.appendReplacement(workSelectField, Constants.SOQL.GROUPING_ANOTATION + counter++);
+		}
+		countMatch.appendTail(workSelectField);
+
+		return workSelectField.toString();
+
 	}
 
 	/**
@@ -227,7 +295,7 @@ public class SOQLExecutor {
 	 * @param record 検索結果
 	 * @return 項目と値のペア
 	 */
-	private static Map<String, String> toMapRecord(List<String> fields, ObjectWrapper record) {
+	private Map<String, String> toMapRecord(List<String> fields, ObjectWrapper record) {
 		Map<String, String> fieldMap = new LinkedHashMap<>(fields.size());
 
 		// 項目名をもとに値とのペアを作成
@@ -252,6 +320,29 @@ public class SOQLExecutor {
 				}
 			}
 
+			// SOQLでサブクエリを使用している場合、サブクエリの結果を取得する
+			if(subqueryMap.containsKey(field)) {
+				// API名を取得
+				Iterator<XmlObjectWrapper> children = obj.orElse(record).getChildren();
+				String apiKey = toAPIName(children, field).orElse(field);
+
+				// 項目を抽出
+				List<String> subqueryFieldList = extractFields(subqueryMap.get(field));
+
+				// レコードを取得
+				Optional<ObjectWrapper> subqueryRecord = record.getChild(apiKey).map(c -> c.getChild("records")).get();
+				if(subqueryRecord.isPresent()){
+					List<Map<String, String>> fieldList = Stream.of(subqueryRecord.get())
+							.map(r -> toMapRecord(subqueryFieldList, r))
+							.collect(Collectors.toList());
+					logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
+
+					fieldMap.put(field, fieldList.toString());
+				}
+
+			}
+
+
 		}
 
 		return fieldMap;
@@ -264,7 +355,7 @@ public class SOQLExecutor {
 	 * @param queryName クエリでの名前
 	 * @return API名
 	 */
-	private static Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
+	private Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
 		Optional<String> apiName =
 				StreamSupport.stream(Spliterators.spliteratorUnknownSize(objects, Spliterator.ORDERED),false)
 				.map(i -> i.getName().getLocalPart()) // ローカル名（API名）に変換
