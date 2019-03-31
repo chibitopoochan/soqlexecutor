@@ -4,7 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,9 @@ public class SOQLExecutorTest {
 	public static final String SOQL_REF = "select child1.child2.child3.NamE from User";
 	public static final String SOQL_MULTI_COLUMN = "select id, username, email from user";
 	public static final String SOQL_FUNCTION = "select id, count(id), name from user";
-	public static final String SOQL_SUBQUERY = "select id,(select id, name from contacts),name from account";
+	public static final String SOQL_SUBQUERY_ONLY = "select (select id, name from contacts) from account";
+	public static final String SOQL_SUBQUERY_DOUBLE = "select (select id, name from contacts),(select id,name from accounts) from account";
+	public static final String SOQL_SUBQUERY_COMPLEX = "select id,(select id, name from contacts),name from account";
 
 	// 検証に使用するインスタンス
 	private PartnerConnectionWrapperMock connection;
@@ -221,7 +223,75 @@ public class SOQLExecutorTest {
 	/**
 	 * サブクエリのレコードを用意
 	 */
-	private void setSubqueryRecords() {
+	private void setSubqueryOnlyRecords() {
+		// 参照先レコードの作成
+		XmlObjectWrapperMock child3 = new XmlObjectWrapperMock();
+		child3.addChild(createColumn("id", "id2"));
+		child3.addChild(createColumn("name", "name2"));
+
+		// 参照先（中間）レコードの作成
+		XmlObjectWrapperMock child2 = new XmlObjectWrapperMock();
+		child2.addChild(createColumn("records", child3));
+
+		// レコードの作成
+		subqueryRecords = new SObjectWrapperMock[1];
+		subqueryRecords[0] = new SObjectWrapperMock();
+		subqueryRecords[0].addChild(createColumn("Contacts", child2));
+
+		// クエリ結果を作成
+		QueryResultWrapperMock subqueryResult = new QueryResultWrapperMock();
+		subqueryResult.setRecords(subqueryRecords);
+		subqueryResult.setSize(1);
+		subqueryResult.setDone(true);
+
+		// Wrapperに設定
+		connection.putSOQL(SOQL_SUBQUERY_ONLY, subqueryResult);
+
+	}
+
+	/**
+	 * サブクエリのレコードを用意
+	 */
+	private void setSubqueryDoubleRecords() {
+		// 参照先レコードの作成
+		XmlObjectWrapperMock accountChild2 = new XmlObjectWrapperMock();
+		accountChild2.addChild(createColumn("id", "id2"));
+		accountChild2.addChild(createColumn("name", "name2"));
+
+		// 参照先（中間）レコードの作成
+		XmlObjectWrapperMock accountChild = new XmlObjectWrapperMock();
+		accountChild.addChild(createColumn("records", accountChild2));
+
+		// 参照先レコードの作成
+		XmlObjectWrapperMock contactChild2 = new XmlObjectWrapperMock();
+		contactChild2.addChild(createColumn("id", "id2"));
+		contactChild2.addChild(createColumn("name", "name2"));
+
+		// 参照先（中間）レコードの作成
+		XmlObjectWrapperMock contactChild = new XmlObjectWrapperMock();
+		contactChild.addChild(createColumn("records", contactChild2));
+
+		// レコードの作成
+		subqueryRecords = new SObjectWrapperMock[1];
+		subqueryRecords[0] = new SObjectWrapperMock();
+		subqueryRecords[0].addChild(createColumn("Accounts", accountChild));
+		subqueryRecords[0].addChild(createColumn("Contacts", contactChild));
+
+		// クエリ結果を作成
+		QueryResultWrapperMock subqueryResult = new QueryResultWrapperMock();
+		subqueryResult.setRecords(subqueryRecords);
+		subqueryResult.setSize(1);
+		subqueryResult.setDone(true);
+
+		// Wrapperに設定
+		connection.putSOQL(SOQL_SUBQUERY_DOUBLE, subqueryResult);
+
+	}
+
+	/**
+	 * サブクエリのレコードを用意
+	 */
+	private void setSubqueryComplexRecords() {
 		// 参照先レコードの作成
 		XmlObjectWrapperMock child3 = new XmlObjectWrapperMock();
 		child3.addChild(createColumn("id", "id2"));
@@ -245,7 +315,7 @@ public class SOQLExecutorTest {
 		subqueryResult.setDone(true);
 
 		// Wrapperに設定
-		connection.putSOQL(SOQL_SUBQUERY, subqueryResult);
+		connection.putSOQL(SOQL_SUBQUERY_COMPLEX, subqueryResult);
 
 	}
 
@@ -432,9 +502,9 @@ public class SOQLExecutorTest {
 
 	}
 
-	@Test public void testExecSOQLWithSubquery() throws ConnectionException {
+	@Test public void testExecSOQLWithSubqueryOnly() throws ConnectionException {
 		// 個別の初期化処理
-		setSubqueryRecords();
+		setSubqueryOnlyRecords();
 
 		// 接続設定
 		connection.setSuccess(true);
@@ -443,7 +513,72 @@ public class SOQLExecutorTest {
 		executor.setAllOption(false);
 
 		// SOQLを実行
-		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY);
+		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY_ONLY);
+
+		// 結果の確認
+		// パラメータが渡されていること
+		// バッチサイズが正しい
+		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
+		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
+
+		List<Map<String, String>> resultList = new LinkedList<>();
+		Map<String, String> resultMap = new LinkedHashMap<>();
+		resultMap.put("id", "id2");
+		resultMap.put("name", "name2");
+		resultList.add(resultMap);
+		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
+
+	}
+
+	@Test public void testExecSOQLWithSubqueryDouble() throws ConnectionException {
+		// 個別の初期化処理
+		setSubqueryDoubleRecords();
+
+		// 接続設定
+		connection.setSuccess(true);
+
+		// SOQL実行のパラメータを設定
+		executor.setAllOption(false);
+
+		// SOQLを実行
+		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY_DOUBLE);
+
+		// 結果の確認
+		// パラメータが渡されていること
+		// バッチサイズが正しい
+		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
+		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
+
+		// サブクエリの確認
+		List<Map<String, String>> resultList = new LinkedList<>();
+		Map<String, String> resultMap = new LinkedHashMap<>();
+		resultMap.put("id", "id2");
+		resultMap.put("name", "name2");
+		resultList.add(resultMap);
+		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
+
+		// サブクエリ２の確認
+		List<Map<String, String>> resultList2 = new LinkedList<>();
+		Map<String, String> resultMap2 = new LinkedHashMap<>();
+		resultMap2.put("id", "id2");
+		resultMap2.put("name", "name2");
+		resultList2.add(resultMap2);
+		assertThat(records.get(0).get("accounts"), is(resultList2.toString()));
+
+	}
+
+	@Test public void testExecSOQLWithSubqueryComplex() throws ConnectionException {
+		// 個別の初期化処理
+		setSubqueryComplexRecords();
+
+		// 接続設定
+		connection.setSuccess(true);
+
+		// SOQL実行のパラメータを設定
+		executor.setAllOption(false);
+
+		// SOQLを実行
+		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY_COMPLEX);
 
 		// 結果の確認
 		// パラメータが渡されていること
@@ -454,7 +589,7 @@ public class SOQLExecutorTest {
 		assertThat(records.get(0).get("name"), is((String)subqueryRecords[0].getField("name").get()));
 
 		List<Map<String, String>> resultList = new LinkedList<>();
-		Map<String, String> resultMap = new HashMap<>();
+		Map<String, String> resultMap = new LinkedHashMap<>();
 		resultMap.put("id", "id2");
 		resultMap.put("name", "name2");
 		resultList.add(resultMap);

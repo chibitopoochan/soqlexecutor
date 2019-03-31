@@ -177,17 +177,16 @@ public class SOQLExecutor {
 
 		// サブクエリをリレーション名に置換
 		StringBuffer workSelectField = new StringBuffer();
-		int counter = 1;
 		while(subqueryMatch.find()) {
 			// リレーション名に置き換え
-			String subquery = subqueryMatch.group(counter);
+			String subquery = subqueryMatch.group(1);
 			Matcher formMatch = formPattern.matcher(subquery);
 			if(!formMatch.find()) {
 				logger.warn(resources.getString(Constants.Message.Error.ERR_004), subquery);
 				throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", subquery));
 			}
 			String relationName = formMatch.group(1);
-			subqueryMatch.appendReplacement(workSelectField, ","+relationName);
+			subqueryMatch.appendReplacement(workSelectField, relationName);
 
 			// リレーション名とサブクエリの項目を記録
 			Matcher selectMatch = selectPattern.matcher(subquery);

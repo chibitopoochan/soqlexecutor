@@ -104,7 +104,7 @@ public class Constants {
 			public static final String SELECT_FIELDS = "select\\s+([a-z0-9_.\\s,\\(\\)]+)\\s+from.+";
 			public static final String FROM_FIELD = "\\s+from\\s+([a-z_]+)";
 			public static final String COUNT_FIELDS = "([a-z_]+)\\([a-z0-9_.]+\\)";
-			public static final String QUERY_FIELDS = "[^a-z_]+\\((.+)\\)";
+			public static final String QUERY_FIELDS = "\\((.+?)\\)";
 		}
 	}
 
