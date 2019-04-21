@@ -1,5 +1,10 @@
 package com.gmail.chibitopoochan.soqlexec.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalSObjectResultWrapper;
+
 /**
  * SObject設定値の内、使用する値を保持する
  */
@@ -8,6 +13,7 @@ public class SObjectMetaInfo {
 	private String name;
 	private String label;
 	private String keyPrefix;
+	private Map<String,String> metaMap;
 
 	/**
 	 * 最低限の設定値を持ったメタ情報
@@ -19,6 +25,38 @@ public class SObjectMetaInfo {
 		setName(name);
 		setLabel(label);
 		setKeyPrefix(keyPrefix);
+	}
+
+	/**
+	 * 最大限の設定値を持ったメタ情報
+	 * @param result オブジェクト情報
+	 */
+	public SObjectMetaInfo(DescribeGlobalSObjectResultWrapper result) {
+		this(result.getName(), result.getLabel(), result.getKeyPrefix());
+		metaMap = new HashMap<>();
+		metaMap.put("Name", result.getName());
+		metaMap.put("Label", result.getLabel());
+		metaMap.put("KeyPrefix", result.getKeyPrefix());
+		metaMap.put("LabelPlural", result.getLabelPlural());
+		metaMap.put("Activateable", Boolean.toString(result.getActivateable()));
+		metaMap.put("Custom", Boolean.toString(result.getCustom()));
+		metaMap.put("CustomSetting", Boolean.toString(result.getCustomSetting()));
+		metaMap.put("Deletable", Boolean.toString(result.getDeletable()));
+		metaMap.put("DeprecatedAndHidden", Boolean.toString(result.getDeprecatedAndHidden()));
+		metaMap.put("FeedEnabled", Boolean.toString(result.getFeedEnabled()));
+		metaMap.put("HasSubtypes", Boolean.toString(result.getHasSubtypes()));
+		metaMap.put("IdEnabled", Boolean.toString(result.getIdEnabled()));
+		metaMap.put("IsSubtype", Boolean.toString(result.getIsSubtype()));
+		metaMap.put("Layoutable", Boolean.toString(result.getLayoutable()));
+		metaMap.put("Mergeable", Boolean.toString(result.getMergeable()));
+		metaMap.put("MruEnabled", Boolean.toString(result.getMruEnabled()));
+		metaMap.put("Queryable", Boolean.toString(result.getQueryable()));
+		metaMap.put("Replicateable", Boolean.toString(result.getReplicateable()));
+		metaMap.put("Retrieveable", Boolean.toString(result.getRetrieveable()));
+		metaMap.put("Searchable", Boolean.toString(result.getSearchable()));
+		metaMap.put("Triggerable", Boolean.toString(result.getTriggerable()));
+		metaMap.put("Undeletable", Boolean.toString(result.getUndeletable()));
+		metaMap.put("Updateable", Boolean.toString(result.getUpdateable()));
 	}
 
 	/**
@@ -68,5 +106,14 @@ public class SObjectMetaInfo {
 	public void setKeyPrefix(String keyPrefix) {
 		this.keyPrefix = keyPrefix;
 	}
+
+	/**
+	 * メタ情報の取得
+	 * @return メタ情報
+	 */
+	public Map<String, String> getMetaInfo() {
+		return metaMap;
+	}
+
 
 }
