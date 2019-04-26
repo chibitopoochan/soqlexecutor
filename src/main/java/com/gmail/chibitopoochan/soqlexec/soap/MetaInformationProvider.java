@@ -14,7 +14,6 @@ import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalSObjectResul
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
-import com.sforce.soap.partner.FieldType;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -58,7 +57,7 @@ public class MetaInformationProvider {
 	public List<SObjectMetaInfo> getSObjectList() throws ConnectionException {
 		return Arrays.stream(connection.describeGlobal().getSobjects())
 				.map(MetaInformationProvider::loggingSObject)
-				.map(t -> new SObjectMetaInfo(t.getName(), t.getLabel(), t.getKeyPrefix()))
+				.map(SObjectMetaInfo::new)
 				.collect(Collectors.toList());
 
 	}
@@ -72,45 +71,8 @@ public class MetaInformationProvider {
 	public List<FieldMetaInfo> getFieldList(String name) throws ConnectionException {
 		return Arrays.stream(connection.describeSObject(name).getFields())
 				.map(MetaInformationProvider::loggingField)
-				.map(MetaInformationProvider::toFieldMetaInfo)
+				.map(FieldMetaInfo::new)
 				.collect(Collectors.toList());
-
-	}
-
-	/**
-	 * Salesforceから取得したメタ情報をFieldMetaInfoへ設定
-	 * @param metaInfo 取得したメタ情報
-	 * @return 引数のメタ情報をもとに作成したFieldMetaInfo
-	 */
-	private static FieldMetaInfo toFieldMetaInfo(FieldsWrapper metaInfo) {
-		// メタ情報を設定
-		FieldMetaInfo info = new FieldMetaInfo(
-				 metaInfo.getName()
-				,metaInfo.getLabel()
-				,metaInfo.getLength()
-				,metaInfo.getType());
-
-		// Picklistなら選択肢も設定
-		if (info.getType() == FieldType.picklist.name()) {
-			List<String> picklist = Arrays
-					.stream(metaInfo.getPicklistValues())
-					.filter(p -> p.isActive())
-					.map(p -> p.getValue())
-					.collect(Collectors.toList());
-
-			info.setPicklist(picklist);
-
-		// 参照なら参照先情報も設定
-		} else if (info.getType() == FieldType.reference.name()) {
-			List<String> referList = Arrays
-					.stream(metaInfo.getReferenceTo())
-					.collect(Collectors.toList());
-
-			info.setReferenceToList(referList);
-
-		}
-
-		return info;
 
 	}
 

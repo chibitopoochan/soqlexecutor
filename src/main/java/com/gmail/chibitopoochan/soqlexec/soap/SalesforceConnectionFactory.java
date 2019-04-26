@@ -27,6 +27,10 @@ public class SalesforceConnectionFactory {
 	private ConnectorConfig config;
 	private String username;
 	private String password;
+	private String proxyHost;
+	private int proxyPort;
+	private String proxyUsername;
+	private String proxyPassword;
 
 	// 自身のインスタンス
 	private static Optional<SalesforceConnectionFactory> factory = Optional.empty();
@@ -114,6 +118,11 @@ public class SalesforceConnectionFactory {
         config.setProxyUsername(username);
         config.setProxyPassword(password);
 
+        proxyHost = host;
+        proxyPort = port;
+        proxyUsername = username;
+        proxyPassword = password;
+
 	}
 
 	/**
@@ -136,6 +145,12 @@ public class SalesforceConnectionFactory {
         config.setServiceEndpoint(loginResult.getServerUrl());
         config.setManualLogin(true);
         config.setSessionId(loginResult.getSessionId());
+
+        if(proxyHost != null) {
+        	config.setProxy(proxyHost, proxyPort);
+        	config.setProxyUsername(proxyUsername);
+        	config.setProxyPassword(proxyPassword);
+        }
 
         // 接続を再作成
         try {
