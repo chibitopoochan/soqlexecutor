@@ -108,4 +108,13 @@ public class PartnerConnectionWrapper {
 		return new QueryResultWrapper(connection.queryMore(queryLocator));
 	}
 
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#getUserInfo()}のラップ
+	 * @return ユーザ情報
+	 * @throws ConnectionException 接続エラー
+	 */
+	public GetUserInfoResultWrapper getUserInfo() throws ConnectionException {
+		return new GetUserInfoResultWrapper(connection.getUserInfo());
+	}
+
 }

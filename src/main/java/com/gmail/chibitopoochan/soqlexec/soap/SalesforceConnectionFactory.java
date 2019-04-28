@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.GetUserInfoResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
@@ -24,6 +25,7 @@ public class SalesforceConnectionFactory {
 	// ログイン関連の情報
 	private PartnerConnectionWrapper connection;
 	private LoginResultWrapper loginResult;
+	private GetUserInfoResultWrapper userInfo;
 	private ConnectorConfig config;
 	private String username;
 	private String password;
@@ -155,6 +157,7 @@ public class SalesforceConnectionFactory {
         // 接続を再作成
         try {
 			connection.createNewInstance(config);
+			userInfo = connection.getUserInfo();
 			logger.info(resources.getString(Constants.Message.Information.MSG_006),loginResult.getServerUrl(), loginResult.getSessionId());
 		} catch (ConnectionException e) {
 			logger.error(resources.getString(Constants.Message.Error.ERR_005),loginResult.getServerUrl(), loginResult.getSessionId(), e);
@@ -213,6 +216,7 @@ public class SalesforceConnectionFactory {
 			// 変数の初期化
 			connection = null;
 			loginResult = null;
+			userInfo = null;
 
 		} catch (ConnectionException e) {
 			loginResult = null;
@@ -247,4 +251,11 @@ public class SalesforceConnectionFactory {
 		this.loginResult = result;
 	}
 
+	/**
+	 * ユーザ情報の取得
+	 * @return ユーザ情報
+	 */
+	public GetUserInfoResultWrapper getUserInfo() {
+		return userInfo;
+	}
 }

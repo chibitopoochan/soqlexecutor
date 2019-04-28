@@ -1,5 +1,6 @@
 package com.gmail.chibitopoochan.soqlexec.api;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +226,17 @@ public class Connector {
 	 */
 	public List<FieldMetaInfo> getDescribeFields(String name) throws ConnectionException {
 		return provider.getFieldList(name);
+	}
+
+	/**
+	 * ユーザ情報の取得
+	 * @return ユーザ情報(組織IDのみ)
+	 * @throws ConnectionException 接続エラー
+	 */
+	public Map<String, String> getUserInfo() throws ConnectionException {
+		Map<String,String> userInfoMap = new HashMap<>();
+		userInfoMap.put("OrganizationId", factory.getUserInfo().getOrganizationId());
+		return userInfoMap;
 	}
 
 }
