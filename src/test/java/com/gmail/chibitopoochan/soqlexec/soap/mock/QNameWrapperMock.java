@@ -1,8 +1,8 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QNameWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerQNameWrapper;
 
-public class QNameWrapperMock extends QNameWrapper {
+public class QNameWrapperMock extends PartnerQNameWrapper {
 
 	private String localPart;
 

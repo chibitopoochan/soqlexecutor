@@ -42,6 +42,7 @@ public abstract class AbstractProcessor implements Processor {
 	private int proxyPort;
 	private String proxyUsername;
 	private String proxyPassword;
+	private boolean tool;
 
 	// SOQLの実行クラス
 	private SOQLExecutor executor;
@@ -103,6 +104,9 @@ public abstract class AbstractProcessor implements Processor {
 				}
 				if(Option.ALL.equals(values[0])){
 					all = Boolean.parseBoolean(values[1]);
+				}
+				if(Option.TOOL.equals(values[0])) {
+					tool = Boolean.parseBoolean(values[1]);
 				}
 			}
 		}
@@ -238,6 +242,14 @@ public abstract class AbstractProcessor implements Processor {
 	 */
 	protected boolean isMore() {
 		return more;
+	}
+
+	protected void setTool(boolean tool) {
+		this.tool= tool;
+	}
+
+	protected boolean isTool() {
+		return tool;
 	}
 
 	/**

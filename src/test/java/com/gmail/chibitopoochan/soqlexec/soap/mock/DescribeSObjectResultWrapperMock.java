@@ -1,16 +1,16 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeSObjectResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerFieldsWrapper;
 
-public class DescribeSObjectResultWrapperMock extends DescribeSObjectResultWrapper {
-	private FieldsWrapper[] fields;
+public class DescribeSObjectResultWrapperMock extends PartnerDescribeSObjectResultWrapper {
+	private PartnerFieldsWrapper[] fields;
 
 	/**
 	 *
 	 * @param fields
 	 */
-	public void setFieldsWrapper(FieldsWrapper[] fields) {
+	public void setFieldsWrapper(PartnerFieldsWrapper[] fields) {
 		this.fields = fields;
 	}
 
@@ -18,7 +18,7 @@ public class DescribeSObjectResultWrapperMock extends DescribeSObjectResultWrapp
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper#getFields()
 	 */
 	@Override
-	public FieldsWrapper[] getFields() {
+	public PartnerFieldsWrapper[] getFields() {
 		return fields;
 	}
 

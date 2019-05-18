@@ -20,7 +20,7 @@ import com.gmail.chibitopoochan.soqlexec.soap.mock.DescribeSObjectResultWrapperM
 import com.gmail.chibitopoochan.soqlexec.soap.mock.FieldsWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PartnerConnectionWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.PicklistEntryWrapperMock;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerFieldsWrapper;
 import com.sforce.soap.partner.FieldType;
 import com.sforce.ws.ConnectionException;
 
@@ -59,7 +59,7 @@ public class MetaInformationProviderTest {
 		field.setLength(5);
 
 		sobjectResult = new DescribeSObjectResultWrapperMock();
-		sobjectResult.setFieldsWrapper(new FieldsWrapper[]{field});
+		sobjectResult.setFieldsWrapper(new PartnerFieldsWrapper[]{field});
 
 		wrapper = new PartnerConnectionWrapperMock();
 		wrapper.setDescribeGlobalResultWrapper(globalResult);

@@ -1,10 +1,11 @@
-package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
+package com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 
 /**
@@ -12,19 +13,19 @@ import com.sforce.soap.partner.sobject.SObject;
  * 実API呼び出しを分離して依存を下げます。
  * Nullの可能性がある項目はOptionalで返します。
  */
-public class SObjectWrapper implements ObjectWrapper {
+public class PartnerSObjectWrapper implements ObjectWrapper {
 	private SObject result;
 
 	/**
 	 * ラップ対象を持たせずにインスタンス化
 	 */
-	public SObjectWrapper() {}
+	public PartnerSObjectWrapper() {}
 
 	/**
 	 * {@link com.sforce.soap.partner.sobject.SObject}をラップ
 	 * @param result ラップ対象
 	 */
-	public SObjectWrapper(SObject result) {
+	public PartnerSObjectWrapper(SObject result) {
 		setSObjectWrapper(result);
 	}
 
@@ -42,7 +43,7 @@ public class SObjectWrapper implements ObjectWrapper {
 	 * @return 参照先オブジェクト
 	 */
 	public Optional<ObjectWrapper> getChild(String name) {
-		return Optional.ofNullable(result.getChild(name)).map(c -> (ObjectWrapper)new XmlObjectWrapper(c));
+		return Optional.ofNullable(result.getChild(name)).map(c -> (ObjectWrapper)new PartnerXmlObjectWrapper(c));
 	}
 
 	/**
@@ -58,9 +59,9 @@ public class SObjectWrapper implements ObjectWrapper {
 	 * {@link com.sforce.soap.partner.sobject.SObject#getChildren()}をラップ
 	 * @return 子要素一覧
 	 */
-	public Iterator<XmlObjectWrapper> getChildren() {
-		List<XmlObjectWrapper> children = new LinkedList<>();
-		result.getChildren().forEachRemaining(c -> children.add(new XmlObjectWrapper(c)));
+	public Iterator<ObjectWrapper> getChildren() {
+		List<ObjectWrapper> children = new LinkedList<>();
+		result.getChildren().forEachRemaining(c -> children.add(new PartnerXmlObjectWrapper(c)));
 		return children.iterator();
 	}
 
@@ -68,8 +69,8 @@ public class SObjectWrapper implements ObjectWrapper {
 	 * {@link com.sforce.soap.partner.sobject.SObject#getName()}をラップ
 	 * @return 名前
 	 */
-	public QNameWrapper getName() {
-		return new QNameWrapper(result.getName());
+	public PartnerQNameWrapper getName() {
+		return new PartnerQNameWrapper(result.getName());
 	}
 
 	/**

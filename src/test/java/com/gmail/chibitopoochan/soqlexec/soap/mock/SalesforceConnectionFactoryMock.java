@@ -1,10 +1,10 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
 import com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ConnectionWrapper;
 
 public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory {
-	private PartnerConnectionWrapper partner;
+	private ConnectionWrapper partner;
 	private boolean login;
 	private boolean logout;
 	private boolean error;
@@ -25,7 +25,7 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory#setParameter(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setParameter(String authEndPoint, String username, String password) {
+	public void setParameter(String authEndPoint, String username, String password, boolean tool) {
 		this.authEndPoint = authEndPoint;
 		this.username = username;
 		this.password = password;
@@ -85,11 +85,11 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory#getPartnerConnection()
 	 */
 	@Override
-	public PartnerConnectionWrapper getPartnerConnection() {
+	public ConnectionWrapper getPartnerConnection() {
 		return partner;
 	}
 
-	public void setPartnerConnection(PartnerConnectionWrapper partner) {
+	public void setPartnerConnection(ConnectionWrapper partner) {
 		this.partner = partner;
 	}
 

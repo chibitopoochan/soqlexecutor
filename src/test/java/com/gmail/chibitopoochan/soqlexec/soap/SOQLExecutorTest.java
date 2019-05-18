@@ -19,7 +19,7 @@ import com.gmail.chibitopoochan.soqlexec.soap.mock.QNameWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.QueryResultWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SObjectWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.XmlObjectWrapperMock;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerXmlObjectWrapper;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -325,7 +325,7 @@ public class SOQLExecutorTest {
 	 * @param value 値
 	 * @return 列情報
 	 */
-	private XmlObjectWrapper createColumn(String key, String value) {
+	private PartnerXmlObjectWrapper createColumn(String key, String value) {
 		QNameWrapperMock name = new QNameWrapperMock();
 		name.setLocalPart(key);
 
@@ -342,7 +342,7 @@ public class SOQLExecutorTest {
 	 * @param ref 参照先
 	 * @return 列情報
 	 */
-	private XmlObjectWrapper createColumn(String key, XmlObjectWrapperMock ref) {
+	private PartnerXmlObjectWrapper createColumn(String key, XmlObjectWrapperMock ref) {
 		QNameWrapperMock name = new QNameWrapperMock();
 		name.setLocalPart(key);
 		ref.setName(name);

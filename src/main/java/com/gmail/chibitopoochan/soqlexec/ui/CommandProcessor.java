@@ -36,11 +36,11 @@ public class CommandProcessor extends AbstractProcessor {
 		if(isProxyConnection()) {
 			// Proxyを使用
 			factory = SalesforceConnectionFactory.newInstance(
-					getEnv(), getUsername(), getPassword(),
+					getEnv(), getUsername(), getPassword(),isTool(),
 					getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
 		} else {
 			factory = SalesforceConnectionFactory.newInstance(
-					getEnv(), getUsername(), getPassword());
+					getEnv(), getUsername(), getPassword(), isTool());
 		}
 
 		if(!factory.login()) {

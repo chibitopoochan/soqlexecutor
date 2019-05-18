@@ -5,9 +5,11 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.tooling.wrapper.ToolingConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.GetUserInfoResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -23,7 +25,7 @@ public class SalesforceConnectionFactory {
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
 	// ログイン関連の情報
-	private PartnerConnectionWrapper connection;
+	private ConnectionWrapper connection;
 	private LoginResultWrapper loginResult;
 	private GetUserInfoResultWrapper userInfo;
 	private ConnectorConfig config;
@@ -50,10 +52,11 @@ public class SalesforceConnectionFactory {
 	 * @param authEndPoint 認証先（URL）
 	 * @param username ユーザ名
 	 * @param password パスワード
+	 * @param useTooling ツールAPI使用
 	 * @return インスタンス
 	 */
-	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password) {
-		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password));
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling) {
+		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password, useTooling));
 	}
 
 	/**
@@ -67,10 +70,10 @@ public class SalesforceConnectionFactory {
 	 * @param proxyPassword プロキシサーバのパスワード
 	 * @return インスタンス
 	 */
-	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling
 			,String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
 		SalesforceConnectionFactory value = factory.orElse(
-				new SalesforceConnectionFactory(authEndPoint, username, password));
+				new SalesforceConnectionFactory(authEndPoint, username, password, useTooling));
 		value.setProxyParameter(proxyServer, proxyPort, proxyUser, proxyPassword);
 		return value;
 	}
@@ -86,8 +89,8 @@ public class SalesforceConnectionFactory {
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 */
-	private SalesforceConnectionFactory(String authEndPoint, String username, String password) {
-		setParameter(authEndPoint, username, password);
+	private SalesforceConnectionFactory(String authEndPoint, String username, String password,boolean useTooling) {
+		setParameter(authEndPoint, username, password, useTooling);
 	}
 
 	/**
@@ -96,8 +99,8 @@ public class SalesforceConnectionFactory {
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 */
-	public void setParameter(String authEndPoint, String username, String password) {
-		connection = new PartnerConnectionWrapper();
+	public void setParameter(String authEndPoint, String username, String password, boolean useTooling) {
+		connection = useTooling ? new ToolingConnectionWrapper() : new PartnerConnectionWrapper();
         config = new ConnectorConfig();
         config.setAuthEndpoint(authEndPoint);
         config.setServiceEndpoint(authEndPoint);
@@ -131,7 +134,7 @@ public class SalesforceConnectionFactory {
 	 * SalesforceAPIのラッパーを設定
 	 * @param wrapper SalesforceAPIのラッパー
 	 */
-	public void setPartnerConnection(PartnerConnectionWrapper wrapper) {
+	public void setPartnerConnection(ConnectionWrapper wrapper) {
 		this.connection = wrapper;
 	}
 
@@ -140,7 +143,7 @@ public class SalesforceConnectionFactory {
 	 * 取得時に都度接続を生成
 	 * @return SalesforceAPIのラッパー
 	 */
-	public PartnerConnectionWrapper getPartnerConnection() {
+	public ConnectionWrapper getPartnerConnection() {
 		// 接続設定を再作成
         ConnectorConfig config = new ConnectorConfig();
         config.setAuthEndpoint(loginResult.getServerUrl());

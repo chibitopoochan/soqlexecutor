@@ -1,8 +1,8 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerLoginResultWrapper;
 
-public class LoginResultWrapperMock extends LoginResultWrapper {
+public class LoginResultWrapperMock extends PartnerLoginResultWrapper {
 	private String sessionId;
 	private String serverUrl;
 

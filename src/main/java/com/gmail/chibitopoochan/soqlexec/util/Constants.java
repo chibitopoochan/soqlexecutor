@@ -80,6 +80,7 @@ public class Constants {
 				public static final String MORE = "more";
 				public static final String DELIMITA = ";";
 				public static final String SIGN = "=";
+				public static final String TOOL = "tool";
 			}
 
 			public class Proxy {

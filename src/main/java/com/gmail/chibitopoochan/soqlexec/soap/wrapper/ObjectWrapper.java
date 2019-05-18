@@ -23,7 +23,7 @@ public interface ObjectWrapper {
 	 * {@link com.sforce.soap.partner.sobject.SObject#getChildren()}をラップ
 	 * @return 子要素一覧
 	 */
-	Iterator<XmlObjectWrapper> getChildren();
+	Iterator<ObjectWrapper> getChildren();
 
 	/**
 	 * {@link com.sforce.soap.partner.sobject.SObject#getValue()}をラップ

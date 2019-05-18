@@ -1,23 +1,23 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.SObjectWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerQueryResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerSObjectWrapper;
 
-public class QueryResultWrapperMock extends QueryResultWrapper {
+public class QueryResultWrapperMock extends PartnerQueryResultWrapper {
 	private int size;
 	private boolean done;
 	private String queryLocator;
-	private SObjectWrapper[] records;
+	private PartnerSObjectWrapper[] records;
 
 	/* (非 Javadoc)
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper#getRecords()
 	 */
 	@Override
-	public SObjectWrapper[] getRecords() {
+	public PartnerSObjectWrapper[] getRecords() {
 		return records;
 	}
 
-	public void setRecords(SObjectWrapper[] records) {
+	public void setRecords(PartnerSObjectWrapper[] records) {
 		this.records = records;
 	}
 

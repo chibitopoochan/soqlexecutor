@@ -121,7 +121,7 @@ public class FieldMetaInfo {
 		metaMap.put("RestrictedDelete", Boolean.toString(f.getRestrictedDelete()));
 		metaMap.put("RestrictedPicklist", Boolean.toString(f.getRestrictedPicklist()));
 		metaMap.put("Scale", Integer.toString(f.getScale()));
-		metaMap.put("SoapType", f.getSoapType().name());
+		metaMap.put("SoapType", f.getSoapType());
 		metaMap.put("Sortable", Boolean.toString(f.getSortable()));
 		metaMap.put("Unique", Boolean.toString(f.getUnique()));
 		metaMap.put("Updateable", Boolean.toString(f.getUpdateable()));

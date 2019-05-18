@@ -117,7 +117,7 @@ public class ProcessorFactoryImpl extends ProcessorFactory {
 		// 値の形式が正しいか？
 		// SETの検証
 		if(argPearMap.containsKey(Parameter.SET)) {
-			if(isInvalidOption(argPearMap.get(Parameter.SET), Option.ALL, Option.MORE)) {
+			if(isInvalidOption(argPearMap.get(Parameter.SET), Option.ALL, Option.MORE, Option.TOOL)) {
 				return false;
 			}
 		}

@@ -77,14 +77,14 @@ public class Connector {
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password, String env) throws Exception {
+	public static Connector login(String username, String password, String env, boolean tool) throws Exception {
 		SalesforceConnectionFactory factory;
 
 		if(Connector.useProxy) {
-			factory = SalesforceConnectionFactory.newInstance(env, username, password
+			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool
 					,Connector.proxyHost, Connector.proxyPort, Connector.proxyId, Connector.proxyPassword);
 		} else {
-			factory = SalesforceConnectionFactory.newInstance(env, username, password);
+			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool);
 		}
 
 		if(!factory.login()) {
@@ -137,8 +137,8 @@ public class Connector {
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password) throws Exception {
-		return Connector.login(username, password, properties.getString(Constants.Properties.AUTH_END_POINT));
+	public static Connector login(String username, String password, boolean tool) throws Exception {
+		return Connector.login(username, password, properties.getString(Constants.Properties.AUTH_END_POINT), tool);
 	}
 
 	/**

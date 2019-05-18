@@ -42,7 +42,7 @@ public class SalesforceConnectionFactoryTest {
 
     	// Loginを実行
     	SalesforceConnectionFactory.setSalesforceConnectionFactory(null);
-    	factory = SalesforceConnectionFactory.newInstance(url, username, password);
+    	factory = SalesforceConnectionFactory.newInstance(url, username, password, false);
     	factory.setPartnerConnection(mock);
     	factory.setLoginResult(result);
 

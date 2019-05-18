@@ -20,10 +20,9 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.sforce.ws.ConnectionException;
 
@@ -37,7 +36,7 @@ public class SOQLExecutor {
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
 	public static final int DEFAULT_BATCH_SIZE = 1000;
-	private PartnerConnectionWrapper connection;
+	private ConnectionWrapper connection;
 	private QueryMore more = new QueryMore();
 	private boolean all;
 	private int size;
@@ -56,7 +55,7 @@ public class SOQLExecutor {
 	 * 接続を持つインスタンスを生成
 	 * @param connection
 	 */
-	public SOQLExecutor(PartnerConnectionWrapper connection) {
+	public SOQLExecutor(ConnectionWrapper connection) {
 		setPartnerConnection(connection);
 	}
 
@@ -64,7 +63,7 @@ public class SOQLExecutor {
 	 *  接続を設定
 	 * @param connection
 	 */
-	public void setPartnerConnection(PartnerConnectionWrapper connection) {
+	public void setPartnerConnection(ConnectionWrapper connection) {
 		this.connection = connection;
 		this.connection.setQueryOption(DEFAULT_BATCH_SIZE);
 		this.all = false;
@@ -306,7 +305,7 @@ public class SOQLExecutor {
 			Optional<ObjectWrapper> obj = Optional.empty();
 			for(String key : keys) {
 				// API名を取得
-				Iterator<XmlObjectWrapper> children = obj.orElse(record).getChildren();
+				Iterator<ObjectWrapper> children = obj.orElse(record).getChildren();
 				String apiKey = toAPIName(children, key).orElse(key);
 
 				// 項目の値か参照先を取得
@@ -322,7 +321,7 @@ public class SOQLExecutor {
 			// SOQLでサブクエリを使用している場合、サブクエリの結果を取得する
 			if(subqueryMap.containsKey(field)) {
 				// API名を取得
-				Iterator<XmlObjectWrapper> children = obj.orElse(record).getChildren();
+				Iterator<ObjectWrapper> children = obj.orElse(record).getChildren();
 				String apiKey = toAPIName(children, field).orElse(field);
 
 				// 項目を抽出
@@ -354,7 +353,7 @@ public class SOQLExecutor {
 	 * @param queryName クエリでの名前
 	 * @return API名
 	 */
-	private Optional<String> toAPIName(Iterator<XmlObjectWrapper> objects, String queryName) {
+	private Optional<String> toAPIName(Iterator<ObjectWrapper> objects, String queryName) {
 		Optional<String> apiName =
 				StreamSupport.stream(Spliterators.spliteratorUnknownSize(objects, Spliterator.ORDERED),false)
 				.map(i -> i.getName().getLocalPart()) // ローカル名（API名）に変換

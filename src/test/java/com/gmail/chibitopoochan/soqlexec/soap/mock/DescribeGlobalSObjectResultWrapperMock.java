@@ -1,8 +1,8 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalSObjectResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeGlobalSObjectResultWrapper;
 
-public class DescribeGlobalSObjectResultWrapperMock extends DescribeGlobalSObjectResultWrapper {
+public class DescribeGlobalSObjectResultWrapperMock extends PartnerDescribeGlobalSObjectResultWrapper {
 	private String name;
 	private String label;
 	private String keyPrefix;

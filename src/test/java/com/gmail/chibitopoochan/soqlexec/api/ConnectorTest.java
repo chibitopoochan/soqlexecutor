@@ -58,7 +58,7 @@ public class ConnectorTest {
 		factory = new SalesforceConnectionFactoryMock();
 		factory.setLoginError(false);
 		factory.setPartnerConnection(wrapper);
-		factory.setParameter(authEndPoint, username, password);
+		factory.setParameter(authEndPoint, username, password,false);
 
 		SalesforceConnectionFactory.setSalesforceConnectionFactory(factory);
 
@@ -84,7 +84,7 @@ public class ConnectorTest {
 		executor.setQueryMore(more);
 
 		// ログイン
-		Connector connect = Connector.login(username, password);
+		Connector connect = Connector.login(username, password, false);
 		assertThat(factory.getUsername(), is(username));
 		assertThat(factory.getPassword(), is(password));
 		assertThat(factory.getAuthEndPoint(), is(authEndPoint));
@@ -118,7 +118,7 @@ public class ConnectorTest {
 		provider.setFieldList(field);
 
 		// ログイン
-		Connector connect = Connector.login(username, password);
+		Connector connect = Connector.login(username, password, false);
 		connect.setMetaInfoProvieder(provider);
 
 		assertThat(connect.getDescribeSObjects(), is(obj));
@@ -134,7 +134,7 @@ public class ConnectorTest {
 	@Test public void testOperateWithLogout() throws Exception {
 
 		// ログイン
-		Connector connect = Connector.login(username, password);
+		Connector connect = Connector.login(username, password, false);
 		assertThat(factory.getUsername(), is(username));
 		assertThat(factory.getPassword(), is(password));
 		assertThat(factory.getAuthEndPoint(), is(authEndPoint));
@@ -162,7 +162,7 @@ public class ConnectorTest {
 
 		// ログイン
 		Connector.setProxySetting(proxyHost, proxyPort, proxyId, proxyPassword);
-		Connector.login(username, password);
+		Connector.login(username, password, false);
 
 		assertThat(factory.getProxyHost(), is(proxyHost));
 		assertThat(factory.getProxyPort(), is(proxyPort));
@@ -170,7 +170,7 @@ public class ConnectorTest {
 		assertThat(factory.getProxyPass(), is(proxyPassword));
 
 		// 再ログイン（プロキシ設定の指定が無ければ通常ログイン）
-		Connector.login(username, password);
+		Connector.login(username, password, false);
 		assertThat(factory.getProxyHost(), nullValue());
 		assertThat(factory.getProxyPort(), is(0));
 		assertThat(factory.getProxyUser(), nullValue());
@@ -178,7 +178,7 @@ public class ConnectorTest {
 
 		// 再ログイン（プロキシ設定の指定があればプロキシ接続）
 		Connector.setProxySetting(proxyHost, proxyPort, proxyId, proxyPassword);
-		Connector.login(username, password);
+		Connector.login(username, password, false);
 
 		assertThat(factory.getProxyHost(), is(proxyHost));
 		assertThat(factory.getProxyPort(), is(proxyPort));

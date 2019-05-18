@@ -3,11 +3,11 @@ package com.gmail.chibitopoochan.soqlexec.soap.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeSObjectResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.LoginResultWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QueryResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeGlobalResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeSObjectResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerLoginResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerQueryResultWrapper;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
@@ -16,18 +16,18 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	private String username;
 	private String password;
 	private String url;
-	private DescribeGlobalResultWrapper globalResult;
-	private DescribeSObjectResultWrapper fieldResult;
+	private PartnerDescribeGlobalResultWrapper globalResult;
+	private PartnerDescribeSObjectResultWrapper fieldResult;
 	private int queryOption;
-	private Map<String, QueryResultWrapper> resultMap = new HashMap<>();
-	private Map<String, QueryResultWrapper> resultAllMap = new HashMap<>();
-	private Map<String, QueryResultWrapper> resultMoreMap = new HashMap<>();
+	private Map<String, PartnerQueryResultWrapper> resultMap = new HashMap<>();
+	private Map<String, PartnerQueryResultWrapper> resultAllMap = new HashMap<>();
+	private Map<String, PartnerQueryResultWrapper> resultMoreMap = new HashMap<>();
 
 	/**
 	 *
 	 * @param wrapper
 	 */
-	public void setDescribeSObjectResultWrapper(DescribeSObjectResultWrapper wrapper) {
+	public void setDescribeSObjectResultWrapper(PartnerDescribeSObjectResultWrapper wrapper) {
 		this.fieldResult = wrapper;
 	}
 
@@ -35,7 +35,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 *
 	 * @param wrapper
 	 */
-	public void setDescribeGlobalResultWrapper(DescribeGlobalResultWrapper wrapper) {
+	public void setDescribeGlobalResultWrapper(PartnerDescribeGlobalResultWrapper wrapper) {
 		this.globalResult = wrapper;
 	}
 
@@ -73,7 +73,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @param soql
 	 * @param result
 	 */
-	public void putSOQL(String soql, QueryResultWrapper result) {
+	public void putSOQL(String soql, PartnerQueryResultWrapper result) {
 		resultMap.put(soql, result);
 	}
 
@@ -82,7 +82,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @param soql
 	 * @param result
 	 */
-	public void putSOQLAll(String soql, QueryResultWrapper result) {
+	public void putSOQLAll(String soql, PartnerQueryResultWrapper result) {
 		resultAllMap.put(soql, result);
 	}
 
@@ -91,7 +91,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @param queryLocation
 	 * @param result
 	 */
-	public void putSOQLMore(String queryLocation, QueryResultWrapper result) {
+	public void putSOQLMore(String queryLocation, PartnerQueryResultWrapper result) {
 		resultMoreMap.put(queryLocation, result);
 	}
 
@@ -107,11 +107,11 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see PartnerConnectionWrapper#login(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public LoginResultWrapper login(String username, String password) throws ConnectionException {
+	public PartnerLoginResultWrapper login(String username, String password) throws ConnectionException {
 		this.username = username;
 		this.password = password;
 		if(success) {
-			return new LoginResultWrapper();
+			return new PartnerLoginResultWrapper();
 		} else {
 			throw new ConnectionException();
 		}
@@ -131,7 +131,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#describeGlobal()
 	 */
 	@Override
-	public DescribeGlobalResultWrapper describeGlobal() throws ConnectionException {
+	public PartnerDescribeGlobalResultWrapper describeGlobal() throws ConnectionException {
 		if(success) {
 			return globalResult;
 		} else {
@@ -143,7 +143,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#describeSObject(java.lang.String)
 	 */
 	@Override
-	public DescribeSObjectResultWrapper describeSObject(String name) throws ConnectionException {
+	public PartnerDescribeSObjectResultWrapper describeSObject(String name) throws ConnectionException {
 		if(success) {
 			return fieldResult;
 		} else {
@@ -171,7 +171,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#query(java.lang.String)
 	 */
 	@Override
-	public QueryResultWrapper query(String soql) throws ConnectionException {
+	public PartnerQueryResultWrapper query(String soql) throws ConnectionException {
 		if(success) {
 			return resultMap.get(soql);
 		} else {
@@ -183,7 +183,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#queryAll(java.lang.String)
 	 */
 	@Override
-	public QueryResultWrapper queryAll(String soql) throws ConnectionException {
+	public PartnerQueryResultWrapper queryAll(String soql) throws ConnectionException {
 		if(success) {
 			return resultAllMap.get(soql);
 		} else {
@@ -195,7 +195,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper#queryMore(java.lang.String)
 	 */
 	@Override
-	public QueryResultWrapper queryMore(String queryLocator) throws ConnectionException {
+	public PartnerQueryResultWrapper queryMore(String queryLocator) throws ConnectionException {
 		if(success) {
 			return resultMoreMap.get(queryLocator);
 		} else {

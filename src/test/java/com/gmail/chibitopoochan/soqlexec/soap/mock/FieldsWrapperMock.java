@@ -1,15 +1,15 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PicklistEntryWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerFieldsWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerPicklistEntryWrapper;
 
-public class FieldsWrapperMock extends FieldsWrapper {
+public class FieldsWrapperMock extends PartnerFieldsWrapper {
 	private String name;
 	private String label;
 	private int length;
 	private String type;
 	private String[] referenceTo;
-	private PicklistEntryWrapper[] picklistValues;
+	private PartnerPicklistEntryWrapper[] picklistValues;
 
 	public void setType(String type) {
 		this.type = type;
@@ -46,7 +46,7 @@ public class FieldsWrapperMock extends FieldsWrapper {
 	/**
 	 * @param picklistValues セットする picklistValues
 	 */
-	public void setPicklistValues(PicklistEntryWrapper[] picklistValues) {
+	public void setPicklistValues(PartnerPicklistEntryWrapper[] picklistValues) {
 		this.picklistValues = picklistValues;
 	}
 
@@ -94,7 +94,7 @@ public class FieldsWrapperMock extends FieldsWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper#getPicklistValues()
 	 */
 	@Override
-	public PicklistEntryWrapper[] getPicklistValues() {
+	public PartnerPicklistEntryWrapper[] getPicklistValues() {
 		return picklistValues;
 	}
 

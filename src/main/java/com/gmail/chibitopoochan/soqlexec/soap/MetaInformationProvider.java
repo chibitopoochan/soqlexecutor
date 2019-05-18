@@ -12,7 +12,7 @@ import com.gmail.chibitopoochan.soqlexec.model.FieldMetaInfo;
 import com.gmail.chibitopoochan.soqlexec.model.SObjectMetaInfo;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.DescribeGlobalSObjectResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.FieldsWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.util.Constants;
 import com.sforce.ws.ConnectionException;
 
@@ -26,7 +26,7 @@ public class MetaInformationProvider {
 	private static final Logger logger = LoggerFactory.getLogger(MetaInformationProvider.class);
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Constants.Message.RESOURCE);
 
-	private PartnerConnectionWrapper connection;
+	private ConnectionWrapper connection;
 
 	/**
 	 * Salesforceへの接続を持たないインスタンスを生成
@@ -37,7 +37,7 @@ public class MetaInformationProvider {
 	 * Salesforceへの接続を持ったインスタンスを生成
 	 * @param connectionWrapper Salesforceへの接続
 	 */
-	public MetaInformationProvider(PartnerConnectionWrapper connectionWrapper) {
+	public MetaInformationProvider(ConnectionWrapper connectionWrapper) {
 		setPartnerConnection(connectionWrapper);
 	}
 
@@ -45,7 +45,7 @@ public class MetaInformationProvider {
 	 * Salesforceへの接続を設定
 	 * @param partnerConnection Salesforceへの接続
 	 */
-	public void setPartnerConnection(PartnerConnectionWrapper partnerConnection) {
+	public void setPartnerConnection(ConnectionWrapper partnerConnection) {
 		this.connection = partnerConnection;
 	}
 

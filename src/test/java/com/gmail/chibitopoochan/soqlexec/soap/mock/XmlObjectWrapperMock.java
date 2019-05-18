@@ -5,13 +5,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerQNameWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerXmlObjectWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.QNameWrapper;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper;
 
-public class XmlObjectWrapperMock extends XmlObjectWrapper {
-	private Map<String, XmlObjectWrapper> childMap = new HashMap<>();
-	private QNameWrapper name;
+public class XmlObjectWrapperMock extends PartnerXmlObjectWrapper {
+	private Map<String, ObjectWrapper> childMap = new HashMap<>();
+	private PartnerQNameWrapper name;
 	private Object value;
 
 	public void setValue(Object value) {
@@ -34,7 +34,7 @@ public class XmlObjectWrapperMock extends XmlObjectWrapper {
 		return childMap.get(name).getValue();
 	}
 
-	public void addChild(XmlObjectWrapper value) {
+	public void addChild(PartnerXmlObjectWrapper value) {
 		childMap.put(value.getName().getLocalPart(), value);
 	}
 
@@ -42,7 +42,7 @@ public class XmlObjectWrapperMock extends XmlObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper#getChildren()
 	 */
 	@Override
-	public Iterator<XmlObjectWrapper> getChildren() {
+	public Iterator<ObjectWrapper> getChildren() {
 		return childMap.values().iterator();
 	}
 
@@ -54,7 +54,7 @@ public class XmlObjectWrapperMock extends XmlObjectWrapper {
 		return Optional.ofNullable(childMap.get(name));
 	}
 
-	public void setName(QNameWrapper name) {
+	public void setName(PartnerQNameWrapper name) {
 		this.name = name;
 	}
 
@@ -62,7 +62,7 @@ public class XmlObjectWrapperMock extends XmlObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.XmlObjectWrapper#getName()
 	 */
 	@Override
-	public QNameWrapper getName() {
+	public PartnerQNameWrapper getName() {
 		return name;
 	}
 

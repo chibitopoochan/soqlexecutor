@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.gmail.chibitopoochan.soqlexec.soap.SOQLExecutor;
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PartnerConnectionWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ConnectionWrapper;
 import com.sforce.ws.ConnectionException;
 
 public class SOQLExecutorMock extends SOQLExecutor {
-	private PartnerConnectionWrapper connection;
+	private ConnectionWrapper connection;
 	private int size;
 	private boolean all;
 	private boolean error;
@@ -27,11 +27,11 @@ public class SOQLExecutorMock extends SOQLExecutor {
 	}
 
 	@Override
-	public void setPartnerConnection(PartnerConnectionWrapper connection) {
+	public void setPartnerConnection(ConnectionWrapper connection) {
 		this.connection = connection;
 	}
 
-	public PartnerConnectionWrapper getPartnerConnection() {
+	public ConnectionWrapper getPartnerConnection() {
 		return connection;
 	}
 

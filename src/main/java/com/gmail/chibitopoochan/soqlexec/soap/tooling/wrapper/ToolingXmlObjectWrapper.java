@@ -1,10 +1,11 @@
-package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
+package com.gmail.chibitopoochan.soqlexec.soap.tooling.wrapper;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper;
 import com.sforce.ws.bind.XmlObject;
 
 /**
@@ -12,19 +13,19 @@ import com.sforce.ws.bind.XmlObject;
  * 実API呼び出しを分離して依存を下げます。
  * Nullの可能性がある項目はOptionalで返します。
  */
-public class XmlObjectWrapper implements ObjectWrapper {
+public class ToolingXmlObjectWrapper implements ObjectWrapper {
 	private XmlObject result;
 
 	/**
 	 * ラップ対象を持たせずにインスタンス化
 	 */
-	public XmlObjectWrapper(){}
+	public ToolingXmlObjectWrapper(){}
 
 	/**
 	 * {@link com.sforce.ws.bind.XmlObject}をラップ
 	 * @param result ラップ対象
 	 */
-	public XmlObjectWrapper(XmlObject result) {
+	public ToolingXmlObjectWrapper(XmlObject result) {
 		setXmlObjectWrapper(result);
 	}
 
@@ -41,7 +42,7 @@ public class XmlObjectWrapper implements ObjectWrapper {
 	 */
 	@Override
 	public Optional<ObjectWrapper> getChild(String name) {
-		return Optional.ofNullable(result.getChild(name)).map(c -> new XmlObjectWrapper(c));
+		return Optional.ofNullable(result.getChild(name)).map(c -> new ToolingXmlObjectWrapper(c));
 	}
 
 	/* (非 Javadoc)
@@ -56,9 +57,9 @@ public class XmlObjectWrapper implements ObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getChildren()
 	 */
 	@Override
-	public Iterator<XmlObjectWrapper> getChildren() {
-		List<XmlObjectWrapper> children = new LinkedList<>();
-		result.getChildren().forEachRemaining(c -> children.add(new XmlObjectWrapper(c)));
+	public Iterator<ObjectWrapper> getChildren() {
+		List<ObjectWrapper> children = new LinkedList<>();
+		result.getChildren().forEachRemaining(c -> children.add(new ToolingXmlObjectWrapper(c)));
 		return children.iterator();
 	}
 
@@ -74,8 +75,8 @@ public class XmlObjectWrapper implements ObjectWrapper {
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.wrapper.ObjectWrapper#getName()
 	 */
 	@Override
-	public QNameWrapper getName() {
-		return new QNameWrapper(result.getName());
+	public ToolingQNameWrapper getName() {
+		return new ToolingQNameWrapper(result.getName());
 	}
 
 }

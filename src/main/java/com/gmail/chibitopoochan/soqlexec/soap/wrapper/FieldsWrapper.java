@@ -1,280 +1,141 @@
 package com.gmail.chibitopoochan.soqlexec.soap.wrapper;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.FilteredLookupInfo;
-import com.sforce.soap.partner.SoapType;
-
 /**
  * SalesforceAPIのラップ.
  * 実API呼び出しを分離して依存を下げます。
  */
-public class FieldsWrapper {
-	private Field result;
-
-	/**
-	 * ラップ対象を持たせずにインスタンス化
-	 */
-	public FieldsWrapper() {}
-
-	/**
-	 * {@link com.sforce.soap.partner.Field}をラップ
-	 * @param result ラップ対象
-	 */
-	public FieldsWrapper(Field result) {
-		setFieldsWrapper(result);
-	}
-
-	/**
-	 * {@link com.sforce.soap.partner.Field}をラップ
-	 * @param result ラップ対象
-	 */
-	public void setFieldsWrapper(Field result) {
-		this.result = result;
-	}
-
+public interface FieldsWrapper {
 	/**
 	 * {@link com.sforce.soap.partner.Field#getName()}をラップ
 	 * @return 項目名
 	 */
-	public String getName() {
-		return result.getName();
-	}
+	public String getName();
 
 
 	/**
 	 * {@link com.sforce.soap.partner.Field#getLabel()}をラップ
 	 * @return ラベル名
 	 */
-	public String getLabel() {
-		return result.getLabel();
-	}
+	public String getLabel();
 
 
 	/**
 	 * {@link com.sforce.soap.partner.Field#getLength()}をラップ
 	 * @return サイズ
 	 */
-	public int getLength() {
-		return result.getLength();
-	}
+	public int getLength();
 
 
 	/**
 	 * {@link com.sforce.soap.partner.Field#getType()}をラップ
 	 * @return 項目タイプ
 	 */
-	public String getType() {
-		return result.getType().name();
-	}
+	public String getType();
 
 	/**
 	 * {@link com.sforce.soap.partner.Field#getReferenceTo()}をラップ
 	 * @return 参照先
 	 */
-	public String[] getReferenceTo() {
-		return result.getReferenceTo();
-	}
+	public String[] getReferenceTo();
 
-	public boolean getAggregatable() {
-		return result.getAggregatable();
-	}
+	public boolean getAggregatable();
 
-	public boolean getAutoNumber() {
-		return result.getAutoNumber();
-	}
+	public boolean getAutoNumber();
 
-	public int getByteLength() {
-		return result.getByteLength();
-	}
+	public int getByteLength();
 
-	public boolean getCalculated() {
-		return result.getCalculated();
-	}
+	public boolean getCalculated();
 
-	public String getCalculatedFormula() {
-		return result.getCalculatedFormula();
-	}
+	public String getCalculatedFormula();
 
-	public boolean getCascadeDelete() {
-		return result.getCascadeDelete();
-	}
+	public boolean getCascadeDelete();
 
-	public boolean getCaseSensitive() {
-		return result.getCaseSensitive();
-	}
+	public boolean getCaseSensitive();
 
-	public String getCompoundFieldName() {
-		return result.getCompoundFieldName();
-	}
+	public String getCompoundFieldName();
 
-	public String getControllerName() {
-		return result.getControllerName();
-	}
+	public String getControllerName();
 
-	public boolean getCreateable() {
-		return result.getCreateable();
-	}
+	public boolean getCreateable();
 
-	public boolean getCustom() {
-		return result.getCustom();
-	}
+	public boolean getCustom();
 
-	public boolean getDefaultedOnCreate() {
-		return result.getDefaultedOnCreate();
-	}
+	public boolean getDefaultedOnCreate();
 
-	public Object getDefaultValue() {
-		return result.getDefaultValue();
-	}
+	public Object getDefaultValue();
 
-	public String getDefaultValueFormula() {
-		return result.getDefaultValueFormula();
-	}
+	public String getDefaultValueFormula();
 
-	public boolean getDependentPicklist() {
-		return result.getDependentPicklist();
-	}
+	public boolean getDependentPicklist();
 
-	public boolean getDeprecatedAndHidden() {
-		return result.getDeprecatedAndHidden();
-	}
+	public boolean getDeprecatedAndHidden();
 
-	public int getDigits() {
-		return result.getDigits();
-	}
+	public int getDigits();
 
-	public boolean getDisplayLocationInDecimal() {
-		return result.getDisplayLocationInDecimal();
-	}
+	public boolean getDisplayLocationInDecimal();
 
-	public boolean getEncrypted() {
-		return result.getEncrypted();
-	}
+	public boolean getEncrypted();
 
-	public boolean getExternalId() {
-		return result.getExternalId();
-	}
+	public boolean getExternalId();
 
-	public String getExtraTypeInfo() {
-		return result.getExtraTypeInfo();
-	}
+	public String getExtraTypeInfo();
 
-	public boolean getFilterable() {
-		return result.getFilterable();
-	}
+	public boolean getFilterable();
 
-	public FilteredLookupInfo getFilteredLookupInfo() {
-		return result.getFilteredLookupInfo();
-	}
+	public FilteredLookupInfoWrapper getFilteredLookupInfo();
 
-	public boolean getGroupable() {
-		return result.getGroupable();
-	}
+	public boolean getGroupable();
 
-	public boolean getHighScaleNumber() {
-		return result.getHighScaleNumber();
-	}
+	public boolean getHighScaleNumber();
 
-	public boolean getHtmlFormatted() {
-		return result.getHtmlFormatted();
-	}
+	public boolean getHtmlFormatted();
 
-	public boolean getIdLookup() {
-		return result.getIdLookup();
-	}
+	public boolean getIdLookup();
 
-	public String getInlineHelpText() {
-		return result.getInlineHelpText();
-	}
+	public String getInlineHelpText();
 
-	public String getMask() {
-		return result.getMask();
-	}
+	public String getMask();
 
-	public String getMaskType() {
-		return result.getMaskType();
-	}
+	public String getMaskType();
 
-	public boolean getNameField() {
-		return result.getNameField();
-	}
+	public boolean getNameField();
 
-	public boolean getNamePointing() {
-		return result.getNamePointing();
-	}
+	public boolean getNamePointing();
 
-	public boolean getNillable() {
-		return result.getNillable();
-	}
+	public boolean getNillable();
 
-	public boolean getPermissionable() {
-		return result.getPermissionable();
-	}
+	public boolean getPermissionable();
 
-	public int getPrecision() {
-		return result.getPrecision();
-	}
+	public int getPrecision();
 
-	public boolean getQueryByDistance() {
-		return result.getQueryByDistance();
-	}
+	public boolean getQueryByDistance();
 
-	public String getReferenceTargetField() {
-		return result.getReferenceTargetField();
-	}
+	public String getReferenceTargetField();
 
-	public String getRelationshipName() {
-		return result.getRelationshipName();
-	}
+	public String getRelationshipName();
 
-	public int getRelationshipOrder() {
-		return result.getRelationshipOrder();
-	}
+	public int getRelationshipOrder();
 
-	public boolean getRestrictedDelete() {
-		return result.getRestrictedDelete();
-	}
+	public boolean getRestrictedDelete();
 
-	public boolean getRestrictedPicklist() {
-		return result.getRestrictedPicklist();
-	}
+	public boolean getRestrictedPicklist();
 
-	public int getScale() {
-		return result.getScale();
-	}
+	public int getScale();
 
-	public SoapType getSoapType() {
-		return result.getSoapType();
-	}
+	public String getSoapType();
 
-	public boolean getSortable() {
-		return result.getSortable();
-	}
+	public boolean getSortable();
 
-	public boolean getUnique() {
-		return result.getUnique();
-	}
+	public boolean getUnique();
 
-	public boolean getUpdateable() {
-		return result.getUpdateable();
-	}
+	public boolean getUpdateable();
 
-	public boolean getWriteRequiresMasterRead() {
-		return result.getWriteRequiresMasterRead();
-	}
+	public boolean getWriteRequiresMasterRead();
 
 	/**
 	 * {@link com.sforce.soap.partner.Field#getPicklistValues()}をラップ
 	 * @return 選択肢一覧
 	 */
-	public PicklistEntryWrapper[] getPicklistValues() {
-		return Arrays.stream(result.getPicklistValues())
-				.map(p -> new PicklistEntryWrapper(p))
-				.collect(Collectors.toList())
-				.toArray(new PicklistEntryWrapper[0]);
-	}
+	public PicklistEntryWrapper[] getPicklistValues();
 
 }

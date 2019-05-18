@@ -7,6 +7,7 @@ import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Par
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.DELIMITA;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.MORE;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.SIGN;
+import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.TOOL;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -25,9 +26,9 @@ import com.gmail.chibitopoochan.soqlexec.util.Constants.Message.Information;
 /**
  * 対話形式でSOQLを実行.
  * <h3>対話形式</h3>
- * SOQLExecutor -id [username] -pwd [password] (ENV | OPTION | -proxy )
+ * SOQLExecutor -id [username] -pwd [password] (ENV | OPTION | PROXY)
  * ENV:-env [URL]
- * OPTION:-set all=[true/false];more=[true/false]
+ * OPTION:-set all=[true/false];more=[true/false];tool=[true/false]
  * PROXY:-proxy host=[URL];port=[port];id=[id];pwd=[pwd]
  */
 public class DialogProcessor extends AbstractProcessor {
@@ -60,10 +61,10 @@ public class DialogProcessor extends AbstractProcessor {
 		SalesforceConnectionFactory factory;
 		if(isProxyConnection()) {
 			// Proxyを使用
-			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(),
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool(),
 					getProxyHost(), getProxyPort(), getProxyUsername(), getPassword());
 		} else {
-			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword());
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool());
 		}
 		if(!factory.login()) {
 			occurredError = true;
@@ -143,6 +144,8 @@ public class DialogProcessor extends AbstractProcessor {
 			setMore(value);
 		} else if(ALL.equals(key)) {
 			getSOQLExecutor().setAllOption(value);
+		} else if(TOOL.equals(key)) {
+			setTool(value);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_008), key);
 			errorMessage = Optional.of(resources.getString(Constants.Message.Error.ERR_011));

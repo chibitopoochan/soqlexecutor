@@ -1,8 +1,8 @@
 package com.gmail.chibitopoochan.soqlexec.soap.mock;
 
-import com.gmail.chibitopoochan.soqlexec.soap.wrapper.PicklistEntryWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerPicklistEntryWrapper;
 
-public class PicklistEntryWrapperMock extends PicklistEntryWrapper {
+public class PicklistEntryWrapperMock extends PartnerPicklistEntryWrapper {
 	private boolean active;
 	private String value;
 
