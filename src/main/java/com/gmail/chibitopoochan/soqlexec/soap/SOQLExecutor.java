@@ -42,6 +42,7 @@ public class SOQLExecutor {
 	private int size;
 	private Map<String, String> subqueryMap = new HashMap<>();
 	private Pattern selectPattern = Pattern.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern labelPattern = Pattern.compile(Constants.SOQL.Pattern.LABEL_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern countPattern = Pattern.compile(Constants.SOQL.Pattern.COUNT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern subqueryPattern = Pattern.compile(Constants.SOQL.Pattern.QUERY_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern formPattern = Pattern.compile(Constants.SOQL.Pattern.FROM_FIELD, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
@@ -147,8 +148,10 @@ public class SOQLExecutor {
 		// 項目が抽出できたか確認
 		String selectField = "";
 		if(selectMatch.matches()) {
+			// 表示ラベル項目の置き換え
+			selectField = replaceToLabel(selectMatch.group(1));
 			// 集計項目の置き換え
-			selectField = replaceCount(selectMatch.group(1));
+			selectField = replaceCount(selectField);
 			// サブクエリの置き換え
 			selectField = replaceSubquery(selectField);
 		} else {
@@ -200,6 +203,25 @@ public class SOQLExecutor {
 
 		return workSelectField.toString();
 
+	}
+
+	/**
+	 * 表示ラベル項目を項目名に置換
+	 * @param selectField 取得項目の文字列
+	 * @return 置換後の取得項目
+	 */
+	private String replaceToLabel(String selectField) {
+		// 項目からtoLabelを抽出
+		Matcher labelMatch = labelPattern.matcher(selectField);
+
+		// 列名を差し替え
+		StringBuffer workSelectField = new StringBuffer();
+		while(labelMatch.find()) {
+			labelMatch.appendReplacement(workSelectField, labelMatch.group(1));
+		}
+		labelMatch.appendTail(workSelectField);
+
+		return workSelectField.toString();
 	}
 
 	/**
