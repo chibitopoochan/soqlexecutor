@@ -49,6 +49,7 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile files('lib/partner.jar')
     compile files('lib/force-wsc-39.0.1.jar')
     compile files('lib/tooling.jar')

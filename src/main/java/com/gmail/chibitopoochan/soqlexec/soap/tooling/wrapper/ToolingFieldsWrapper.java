@@ -167,7 +167,11 @@ public class ToolingFieldsWrapper implements FieldsWrapper {
 	}
 
 	public FilteredLookupInfoWrapper getFilteredLookupInfo() {
-		return new ToolingFilteredLookupInfoWrapper(result.getFilteredLookupInfo());
+		if(result.getFilteredLookupInfo() == null) {
+			return null;
+		} else {
+			return new ToolingFilteredLookupInfoWrapper(result.getFilteredLookupInfo());
+		}
 	}
 
 	public boolean getGroupable() {
