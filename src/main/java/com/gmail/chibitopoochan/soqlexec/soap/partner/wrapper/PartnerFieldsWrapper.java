@@ -167,7 +167,11 @@ public class PartnerFieldsWrapper implements FieldsWrapper {
 	}
 
 	public FilteredLookupInfoWrapper getFilteredLookupInfo() {
-		return new PartnerFilteredLookupInfoWrapper(result.getFilteredLookupInfo());
+		if(result.getFilteredLookupInfo() == null) {
+			return null;
+		} else {
+			return new PartnerFilteredLookupInfoWrapper(result.getFilteredLookupInfo());
+		}
 	}
 
 	public boolean getGroupable() {

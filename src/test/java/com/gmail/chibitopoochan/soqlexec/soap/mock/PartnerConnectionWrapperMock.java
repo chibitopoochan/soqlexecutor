@@ -6,6 +6,7 @@ import java.util.Map;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerConnectionWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeGlobalResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerDescribeSObjectResultWrapper;
+import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerGetUserInfoResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerLoginResultWrapper;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerQueryResultWrapper;
 import com.sforce.ws.ConnectionException;
@@ -22,6 +23,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	private Map<String, PartnerQueryResultWrapper> resultMap = new HashMap<>();
 	private Map<String, PartnerQueryResultWrapper> resultAllMap = new HashMap<>();
 	private Map<String, PartnerQueryResultWrapper> resultMoreMap = new HashMap<>();
+	private PartnerGetUserInfoResultWrapper userInfo;
 
 	/**
 	 *
@@ -93,6 +95,10 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	 */
 	public void putSOQLMore(String queryLocation, PartnerQueryResultWrapper result) {
 		resultMoreMap.put(queryLocation, result);
+	}
+
+	public void setUserInfo(PartnerGetUserInfoResultWrapper result) {
+		this.userInfo = result;
 	}
 
 	/* (非 Javadoc)
@@ -202,6 +208,16 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 			throw new ConnectionException();
 		}
 	}
+
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerConnectionWrapper#getUserInfo()
+	 */
+	@Override
+	public PartnerGetUserInfoResultWrapper getUserInfo() throws ConnectionException {
+		return userInfo;
+	}
+
+
 
 }
 

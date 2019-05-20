@@ -23,6 +23,16 @@ public class PartnerConnectionWrapper implements ConnectionWrapper {
 	}
 
 	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#queryAll(String)}のラップ
+	 * @param soql SOQL
+	 * @return 実行結果
+	 * @throws ConnectionException 接続エラー
+	 */
+	public PartnerQueryResultWrapper queryAll(String soql) throws ConnectionException {
+		return new PartnerQueryResultWrapper(connection.queryAll(soql));
+	}
+
+	/**
 	 * {@link com.sforce.soap.partner.PartnerConnection#login(String, String)}のラップ.
 	 * 詳細は呼び出し先のAPIを参照のこと
 	 * @param username ユーザ名
@@ -87,16 +97,6 @@ public class PartnerConnectionWrapper implements ConnectionWrapper {
 	 */
 	public PartnerQueryResultWrapper query(String soql) throws ConnectionException {
 		return new PartnerQueryResultWrapper(connection.query(soql));
-	}
-
-	/**
-	 * {@link com.sforce.soap.partner.PartnerConnection#queryAll(String)}のラップ
-	 * @param soql SOQL
-	 * @return 実行結果
-	 * @throws ConnectionException 接続エラー
-	 */
-	public PartnerQueryResultWrapper queryAll(String soql) throws ConnectionException {
-		return new PartnerQueryResultWrapper(connection.queryAll(soql));
 	}
 
 	/**

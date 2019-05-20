@@ -170,6 +170,7 @@ public class ConnectorTest {
 		assertThat(factory.getProxyPass(), is(proxyPassword));
 
 		// 再ログイン（プロキシ設定の指定が無ければ通常ログイン）
+		setup(); // モックを使いまわしてしまうので再設定
 		Connector.login(username, password, false);
 		assertThat(factory.getProxyHost(), nullValue());
 		assertThat(factory.getProxyPort(), is(0));
@@ -177,6 +178,7 @@ public class ConnectorTest {
 		assertThat(factory.getProxyPass(), nullValue());
 
 		// 再ログイン（プロキシ設定の指定があればプロキシ接続）
+		setup(); // モックを使いまわしてしまうので再設定
 		Connector.setProxySetting(proxyHost, proxyPort, proxyId, proxyPassword);
 		Connector.login(username, password, false);
 

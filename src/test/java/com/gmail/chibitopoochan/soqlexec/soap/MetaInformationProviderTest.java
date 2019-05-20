@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.gmail.chibitopoochan.soqlexec.model.FieldMetaInfo;
+import com.gmail.chibitopoochan.soqlexec.model.FieldMetaInfo.Type;
 import com.gmail.chibitopoochan.soqlexec.model.SObjectMetaInfo;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.DescribeGlobalResultWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.DescribeGlobalSObjectResultWrapperMock;
@@ -57,6 +57,22 @@ public class MetaInformationProviderTest {
 		field.setName("name");
 		field.setLabel("label");
 		field.setLength(5);
+		field.setCalculatedFormula("");
+		field.setCompoundFieldName("");
+		field.setControllerName("");
+		field.setDefaultValue(null);
+		field.setDefaultValueFormula("");
+		field.setExtraTypeInfo("");
+		field.setIlteredLookupInfo(null);
+		field.setInlineHelpText("");
+		field.setMask("");
+		field.setMaskType("");
+		field.setPicklistValues(null);
+		field.setReferenceTargetField("");
+		field.setReferenceTo(new String[]{""});
+		field.setRelationshipName("");
+		field.setSoapType("");
+		field.setType("");
 
 		sobjectResult = new DescribeSObjectResultWrapperMock();
 		sobjectResult.setFieldsWrapper(new PartnerFieldsWrapper[]{field});
@@ -152,7 +168,7 @@ public class MetaInformationProviderTest {
 			List<FieldMetaInfo> fieldList = provider.getFieldList(sObject.getName());
 			FieldMetaInfo actual = fieldList.get(0);
 
-			assertThat(actual.getPicklist(), is(Arrays.asList(activeItem.getValue())));
+			assertThat(actual.getMetaInfo().get(FieldMetaInfo.Type.PicklistValues_Active), is(activeItem.getValue()));
 
 		} catch (ConnectionException e) {
 			fail();
@@ -174,7 +190,7 @@ public class MetaInformationProviderTest {
 			List<FieldMetaInfo> fieldList = provider.getFieldList(sObject.getName());
 			FieldMetaInfo actual = fieldList.get(0);
 
-			assertThat(actual.getReferenceToList(), is(Arrays.asList(field.getReferenceTo())));
+			assertThat(actual.getMetaInfo().get(Type.ReferenceTo), is(String.join(",", field.getReferenceTo())));
 
 		} catch (ConnectionException e) {
 			fail();
