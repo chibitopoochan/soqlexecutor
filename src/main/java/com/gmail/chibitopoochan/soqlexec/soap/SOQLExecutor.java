@@ -46,7 +46,8 @@ public class SOQLExecutor {
 	private Pattern labelPattern = Pattern.compile(Constants.SOQL.Pattern.LABEL_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern countPattern = Pattern.compile(Constants.SOQL.Pattern.COUNT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern subqueryPattern = Pattern.compile(Constants.SOQL.Pattern.QUERY_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
-	private Pattern formPattern = Pattern.compile(Constants.SOQL.Pattern.FROM_FIELD, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern fromPattern = Pattern.compile(Constants.SOQL.Pattern.FROM_FIELD, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
+	private Pattern formatPattern = Pattern.compile(Constants.SOQL.Pattern.FORMAT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 
 	/**
 	 * 接続を持たないインスタンスを生成
@@ -149,6 +150,8 @@ public class SOQLExecutor {
 	private List<String> extractFields(String soql) {
 		// 表示ラベル項目の置き換え
 		soql = replaceToLabel(soql);
+		// フォーマット項目の置き換え
+		soql = replaceToFormat(soql);
 		// 集計項目の置き換え
 		soql = replaceCount(soql);
 		// サブクエリの置き換え
@@ -189,7 +192,7 @@ public class SOQLExecutor {
 		while(subqueryMatch.find()) {
 			// リレーション名に置き換え
 			String subquery = subqueryMatch.group(1);
-			Matcher formMatch = formPattern.matcher(subquery);
+			Matcher formMatch = fromPattern.matcher(subquery);
 			if(!formMatch.find()) {
 				logger.warn(resources.getString(Constants.Message.Error.ERR_004), subquery);
 				throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", subquery));
@@ -220,6 +223,25 @@ public class SOQLExecutor {
 	private String replaceToLabel(String selectField) {
 		// 項目からtoLabelを抽出
 		Matcher labelMatch = labelPattern.matcher(selectField);
+
+		// 列名を差し替え
+		StringBuffer workSelectField = new StringBuffer();
+		while(labelMatch.find()) {
+			labelMatch.appendReplacement(workSelectField, labelMatch.group(1));
+		}
+		labelMatch.appendTail(workSelectField);
+
+		return workSelectField.toString();
+	}
+
+	/**
+	 * 表示ラベル項目を項目名に置換
+	 * @param selectField 取得項目の文字列
+	 * @return 置換後の取得項目
+	 */
+	private String replaceToFormat(String selectField) {
+		// 項目からtoLabelを抽出
+		Matcher labelMatch = formatPattern.matcher(selectField);
 
 		// 列名を差し替え
 		StringBuffer workSelectField = new StringBuffer();

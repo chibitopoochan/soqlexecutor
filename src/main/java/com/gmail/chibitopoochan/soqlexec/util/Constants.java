@@ -107,6 +107,7 @@ public class Constants {
 			public static final String LABEL_FIELDS = "toLabel\\(([a-z0-9_.]+)\\)";
 			public static final String COUNT_FIELDS = "([a-z_]+)\\([a-z0-9_.]+\\)";
 			public static final String QUERY_FIELDS = "\\((.+?)\\)";
+			public static final String FORMAT_FIELDS = "format\\(([a-z0-9_.]+)\\)";
 		}
 	}
 
