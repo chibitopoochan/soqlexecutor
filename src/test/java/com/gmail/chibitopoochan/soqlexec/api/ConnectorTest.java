@@ -91,7 +91,7 @@ public class ConnectorTest {
 
 		// クエリの実行
 		connect.setSOQLExecutor(executor);
-		assertThat(connect.execute("select id from user", true, 5), is(result));
+		assertThat(connect.execute("select id from user", true, 5, true), is(result));
 		assertTrue(executor.getAllOption());
 		assertThat(executor.getBatchSize(), is(5));
 		assertThat(connect.executeMore(), is(result));
@@ -145,7 +145,7 @@ public class ConnectorTest {
 
 		thrown.expect(Exception.class);
 
-		connect.execute("", false, 10);
+		connect.execute("", false, 10, true);
 
 	}
 

@@ -146,10 +146,11 @@ public class Connector {
 	 * @param query SOQL
 	 * @param all ALLオプション
 	 * @param batchSize 取得最大件数
+	 * @param join サブクエリの結合
 	 * @return 実行結果
 	 * @throws ConnectionException クエリの実行エラー
 	 */
-	public List<Map<String, String>> execute(String query, boolean all, int batchSize) throws ConnectionException {
+	public List<Map<String, String>> execute(String query, boolean all, int batchSize, boolean join) throws ConnectionException {
 		if(close) {
 			logger.error(resources.getString(Error.ERR_013));
 			throw new ConnectionException(resources.getString(Error.ERR_013));
@@ -158,6 +159,7 @@ public class Connector {
 		// パラメータ設定
 		executor.setAllOption(all);
 		executor.setBatchSize(batchSize);
+		executor.setJoinOption(join);
 
 		// SOQL実行
 		List<Map<String, String>> result = executor.execute(query);

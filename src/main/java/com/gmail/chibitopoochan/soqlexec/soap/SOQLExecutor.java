@@ -39,6 +39,7 @@ public class SOQLExecutor {
 	private ConnectionWrapper connection;
 	private QueryMore more = new QueryMore();
 	private boolean all;
+	private boolean join;
 	private int size;
 	private Map<String, String> subqueryMap = new HashMap<>();
 	private Pattern selectPattern = Pattern.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
@@ -86,6 +87,10 @@ public class SOQLExecutor {
 		this.all = all;
 	}
 
+	public void setJoinOption(boolean join) {
+		this.join = join;
+	}
+
 	/**
 	 * SOQLの実行
 	 * @param soql 実行するSOQL
@@ -104,7 +109,7 @@ public class SOQLExecutor {
 
 		// レコードを取得
 		List<Map<String, String>> fieldList = Arrays.stream(result.getRecords())
-				.map(r -> toMapRecord(fields, r))
+				.flatMap(r -> toMapRecord(fields, r).stream())
 				.collect(Collectors.toList());
 		logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
 
@@ -142,18 +147,20 @@ public class SOQLExecutor {
 	 * @return 項目一覧
 	 */
 	private List<String> extractFields(String soql) {
+		// 表示ラベル項目の置き換え
+		soql = replaceToLabel(soql);
+		// 集計項目の置き換え
+		soql = replaceCount(soql);
+		// サブクエリの置き換え
+		soql = replaceSubquery(soql);
+
 		// SELECT文から項目を抽出
 		Matcher selectMatch = selectPattern.matcher(soql);
 
 		// 項目が抽出できたか確認
 		String selectField = "";
 		if(selectMatch.matches()) {
-			// 表示ラベル項目の置き換え
-			selectField = replaceToLabel(selectMatch.group(1));
-			// 集計項目の置き換え
-			selectField = replaceCount(selectField);
-			// サブクエリの置き換え
-			selectField = replaceSubquery(selectField);
+			selectField = selectMatch.group(1);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
@@ -292,7 +299,7 @@ public class SOQLExecutor {
 			// 残りのレコードを取得
 			QueryResultWrapper result = connection.queryMore(queryLocator);
 			List<Map<String, String>> fieldList = Stream.of(result.getRecords())
-					.map(r -> toMapRecord(fields, r))
+					.flatMap(r -> toMapRecord(fields, r).stream())
 					.collect(Collectors.toList());
 			logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
 
@@ -313,9 +320,12 @@ public class SOQLExecutor {
 	 * レコードを項目と値のペアに変換
 	 * @param fields 項目一覧
 	 * @param record 検索結果
+	 * @param join サブクエリの表現（trueなら結合）
 	 * @return 項目と値のペア
 	 */
-	private Map<String, String> toMapRecord(List<String> fields, ObjectWrapper record) {
+	private List<Map<String, String>> toMapRecord(List<String> fields, ObjectWrapper record) {
+		List<Map<String,String>> fieldMapList = new LinkedList<>();
+		List<Map<String,String>> subqueryMapList = new LinkedList<>();
 		Map<String, String> fieldMap = new LinkedHashMap<>(fields.size());
 
 		// 項目名をもとに値とのペアを作成
@@ -333,7 +343,9 @@ public class SOQLExecutor {
 				// 項目の値か参照先を取得
 				if(lastKey.equals(key)) {
 					Optional<Object> value = obj.orElse(record).getField(apiKey);
-					fieldMap.put(field, value.orElse("").toString());
+					if(!subqueryMap.containsKey(field) || join) {
+						fieldMap.put(field, value.orElse("").toString());
+					}
 					logger.debug(resources.getString(Constants.Message.Information.MSG_008), field, value);
 				} else {
 					obj = obj.orElse(record).getChild(apiKey);
@@ -341,7 +353,7 @@ public class SOQLExecutor {
 			}
 
 			// SOQLでサブクエリを使用している場合、サブクエリの結果を取得する
-			if(subqueryMap.containsKey(field)) {
+			if(subqueryMap.containsKey(field) && !join) {
 				// API名を取得
 				Iterator<ObjectWrapper> children = obj.orElse(record).getChildren();
 				String apiKey = toAPIName(children, field).orElse(field);
@@ -350,22 +362,43 @@ public class SOQLExecutor {
 				List<String> subqueryFieldList = extractFields(subqueryMap.get(field));
 
 				// レコードを取得
-				Optional<ObjectWrapper> subqueryRecord = record.getChild(apiKey).map(c -> c.getChild("records")).get();
-				if(subqueryRecord.isPresent()){
-					List<Map<String, String>> fieldList = Stream.of(subqueryRecord.get())
-							.map(r -> toMapRecord(subqueryFieldList, r))
-							.collect(Collectors.toList());
-					logger.info(resources.getString(Constants.Message.Information.MSG_009), fieldList.size());
-
-					fieldMap.put(field, fieldList.toString());
+				Optional<ObjectWrapper> subquery = record.getChild(apiKey);
+				if(subquery.isPresent()){
+					subquery.get().getChildren().forEachRemaining(r -> {
+						if(r.getName().getLocalPart().equals("records")) {
+							for(Map<String,String> m : toMapRecord(subqueryFieldList, r).stream().collect(Collectors.toList())) {
+								Map<String,String> map = new LinkedHashMap<>();
+								for(String key : m.keySet()) {
+									map.put(field + "." + key, m.get(key));
+									fieldMap.put(field + "." + key, "");
+								}
+								subqueryMapList.add(map);
+							}
+						}
+						logger.info(resources.getString(Constants.Message.Information.MSG_009), subqueryMapList.size());
+					});
+				} else {
+					Map<String,String> dummyField = new LinkedHashMap<>();
+					for(String key : subqueryFieldList) {
+						dummyField.put(field + "." + key, "");
+						fieldMap.put(field + "." + key, "");
+					}
+					subqueryMapList.add(dummyField);
 				}
-
 			}
-
-
 		}
 
-		return fieldMap;
+		if(subqueryMapList.isEmpty()) {
+			fieldMapList.add(fieldMap);
+		} else {
+			for(Map<String,String> map : subqueryMapList) {
+				Map<String,String> work = new LinkedHashMap<>(fieldMap);
+				work.putAll(map);
+				fieldMapList.add(work);
+			}
+		}
+
+		return fieldMapList;
 
 	}
 
