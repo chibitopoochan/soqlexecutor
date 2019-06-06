@@ -74,17 +74,19 @@ public class Connector {
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 * @param env authEndPoint
+	 * @param tool ToolAPI
+	 * @param local 言語
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password, String env, boolean tool) throws Exception {
+	public static Connector login(String username, String password, String env, boolean tool, String local) throws Exception {
 		SalesforceConnectionFactory factory;
 
 		if(Connector.useProxy) {
-			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool
+			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool, local
 					,Connector.proxyHost, Connector.proxyPort, Connector.proxyId, Connector.proxyPassword);
 		} else {
-			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool);
+			factory = SalesforceConnectionFactory.newInstance(env, username, password, tool, local);
 		}
 
 		if(!factory.login()) {
@@ -137,8 +139,8 @@ public class Connector {
 	 * @return Salesforceへの接続
 	 * @throws ConnectionException ログインエラー
 	 */
-	public static Connector login(String username, String password, boolean tool) throws Exception {
-		return Connector.login(username, password, properties.getString(Constants.Properties.AUTH_END_POINT), tool);
+	public static Connector login(String username, String password, boolean tool, String local) throws Exception {
+		return Connector.login(username, password, properties.getString(Constants.Properties.AUTH_END_POINT), tool, local);
 	}
 
 	/**

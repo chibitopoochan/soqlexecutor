@@ -37,6 +37,7 @@ public abstract class AbstractProcessor implements Processor {
 	private String env;
 	private boolean more;
 	private boolean all;
+	private String local = "en_US";
 	private boolean useProxy;
 	private String proxyHost;
 	private int proxyPort;
@@ -108,6 +109,9 @@ public abstract class AbstractProcessor implements Processor {
 				if(Option.TOOL.equals(values[0])) {
 					tool = Boolean.parseBoolean(values[1]);
 				}
+				if(Option.LOCAL.equals(values[0])) {
+					local = values[1];
+				}
 			}
 		}
 
@@ -136,7 +140,8 @@ public abstract class AbstractProcessor implements Processor {
 
 		logger.info(resources.getString(Constants.Message.Information.MSG_010),
 				username, password, env, soql, all, more,
-				proxyHost+":"+proxyPort+" " + proxyUsername + "/" + proxyPassword);
+				proxyHost+":"+proxyPort+" " + proxyUsername + "/" + proxyPassword,
+				local);
 
 	}
 
@@ -314,6 +319,22 @@ public abstract class AbstractProcessor implements Processor {
 	 */
 	protected String getProxyPassword() {
 		return proxyPassword;
+	}
+
+	/**
+	 * LOCALの設定
+	 * @param local LOCAL
+	 */
+	protected void setLocalize(String local) {
+		this.local = local;
+	}
+
+	/**
+	 * LOCALの取得
+	 * @return　Local
+	 */
+	protected String getLocalize() {
+		return local;
 	}
 
 }

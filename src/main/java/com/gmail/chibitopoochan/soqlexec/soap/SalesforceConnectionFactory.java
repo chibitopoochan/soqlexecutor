@@ -35,6 +35,7 @@ public class SalesforceConnectionFactory {
 	private int proxyPort;
 	private String proxyUsername;
 	private String proxyPassword;
+	private String local;
 
 	// 自身のインスタンス
 	private static Optional<SalesforceConnectionFactory> factory = Optional.empty();
@@ -53,10 +54,11 @@ public class SalesforceConnectionFactory {
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 * @param useTooling ツールAPI使用
+	 * @param local 言語
 	 * @return インスタンス
 	 */
-	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling) {
-		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password, useTooling));
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling, String local) {
+		return factory.orElse(new SalesforceConnectionFactory(authEndPoint, username, password, useTooling, local));
 	}
 
 	/**
@@ -70,10 +72,10 @@ public class SalesforceConnectionFactory {
 	 * @param proxyPassword プロキシサーバのパスワード
 	 * @return インスタンス
 	 */
-	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling
+	public static SalesforceConnectionFactory newInstance(String authEndPoint, String username, String password, boolean useTooling, String local
 			,String proxyServer, int proxyPort, String proxyUser, String proxyPassword) {
 		SalesforceConnectionFactory value = factory.orElse(
-				new SalesforceConnectionFactory(authEndPoint, username, password, useTooling));
+				new SalesforceConnectionFactory(authEndPoint, username, password, useTooling, local));
 		value.setProxyParameter(proxyServer, proxyPort, proxyUser, proxyPassword);
 		return value;
 	}
@@ -88,9 +90,10 @@ public class SalesforceConnectionFactory {
 	 * @param authEndPoint 認証先URL
 	 * @param username ユーザ名
 	 * @param password パスワード
+	 * @param local 言語
 	 */
-	private SalesforceConnectionFactory(String authEndPoint, String username, String password,boolean useTooling) {
-		setParameter(authEndPoint, username, password, useTooling);
+	private SalesforceConnectionFactory(String authEndPoint, String username, String password,boolean useTooling, String local) {
+		setParameter(authEndPoint, username, password, useTooling, local);
 	}
 
 	/**
@@ -99,7 +102,7 @@ public class SalesforceConnectionFactory {
 	 * @param username ユーザ名
 	 * @param password パスワード
 	 */
-	public void setParameter(String authEndPoint, String username, String password, boolean useTooling) {
+	public void setParameter(String authEndPoint, String username, String password, boolean useTooling, String local) {
 		connection = useTooling ? new ToolingConnectionWrapper() : new PartnerConnectionWrapper();
         config = new ConnectorConfig();
         config.setAuthEndpoint(authEndPoint);
@@ -108,6 +111,7 @@ public class SalesforceConnectionFactory {
 
         this.username = username;
         this.password = password;
+        this.local = local;
 
 	}
 
@@ -160,6 +164,7 @@ public class SalesforceConnectionFactory {
         // 接続を再作成
         try {
 			connection.createNewInstance(config);
+			connection.setLocaleOptions(local, true);
 			userInfo = connection.getUserInfo();
 			logger.info(resources.getString(Constants.Message.Information.MSG_006),loginResult.getServerUrl(), loginResult.getSessionId());
 		} catch (ConnectionException e) {
@@ -181,6 +186,7 @@ public class SalesforceConnectionFactory {
 		try {
 			// ログイン
 			connection.createNewInstance(config);
+			connection.setLocaleOptions(local, true);
 			loginResult = connection.login(username, password);
 			isSuccess = true;
 

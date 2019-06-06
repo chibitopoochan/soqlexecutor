@@ -124,4 +124,9 @@ public class ToolingConnectionWrapper implements ConnectionWrapper {
 		return new ToolingGetUserInfoResultWrapper(connection.getUserInfo());
 	}
 
+	@Override
+	public void setLocaleOptions(String language, boolean localizeErrors) {
+		// 対応する機能無し
+	}
+
 }

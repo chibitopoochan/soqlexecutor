@@ -25,7 +25,7 @@ public class SalesforceConnectionFactoryMock extends SalesforceConnectionFactory
 	 * @see com.gmail.chibitopoochan.soqlexec.soap.SalesforceConnectionFactory#setParameter(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setParameter(String authEndPoint, String username, String password, boolean tool) {
+	public void setParameter(String authEndPoint, String username, String password, boolean tool, String local) {
 		this.authEndPoint = authEndPoint;
 		this.username = username;
 		this.password = password;

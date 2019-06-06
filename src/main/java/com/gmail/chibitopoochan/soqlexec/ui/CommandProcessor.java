@@ -15,7 +15,7 @@ import com.sforce.ws.ConnectionException;
  * <h3>コマンド形式</h3>
  * SOQLExecutor -id [username] -pwd [password] -query [SOQL] (ENV | OPTION | -proxy )
  * ENV:-env [URL]
- * OPTION:-set all=[true/false];more=[true/false]
+ * OPTION:-set all=[true/false];more=[true/false];local=[localize];
  * PROXY:-proxy host=[URL];port=[port];id=[id];pwd=[pwd]
  */
 public class CommandProcessor extends AbstractProcessor {
@@ -36,11 +36,11 @@ public class CommandProcessor extends AbstractProcessor {
 		if(isProxyConnection()) {
 			// Proxyを使用
 			factory = SalesforceConnectionFactory.newInstance(
-					getEnv(), getUsername(), getPassword(),isTool(),
+					getEnv(), getUsername(), getPassword(),isTool(), getLocalize(),
 					getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
 		} else {
 			factory = SalesforceConnectionFactory.newInstance(
-					getEnv(), getUsername(), getPassword(), isTool());
+					getEnv(), getUsername(), getPassword(), isTool(), getLocalize());
 		}
 
 		if(!factory.login()) {

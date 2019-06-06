@@ -8,6 +8,7 @@ import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Par
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.MORE;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.SIGN;
 import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.TOOL;
+import static com.gmail.chibitopoochan.soqlexec.util.Constants.UserInterface.Parameter.Option.LOCAL;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -61,10 +62,10 @@ public class DialogProcessor extends AbstractProcessor {
 		SalesforceConnectionFactory factory;
 		if(isProxyConnection()) {
 			// Proxyを使用
-			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool(),
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool(), getLocalize(),
 					getProxyHost(), getProxyPort(), getProxyUsername(), getPassword());
 		} else {
-			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool());
+			factory = SalesforceConnectionFactory.newInstance(getEnv(), getUsername(), getPassword(), isTool(), getLocalize());
 		}
 		if(!factory.login()) {
 			occurredError = true;
@@ -139,13 +140,15 @@ public class DialogProcessor extends AbstractProcessor {
 	 * @param key オプション
 	 * @param value 設定値
 	 */
-	private void analyzeSetOption(String key, boolean value) {
+	private void analyzeSetOption(String key, String value) {
 		if(MORE.equals(key)) {
-			setMore(value);
+			setMore(Boolean.getBoolean(value));
 		} else if(ALL.equals(key)) {
-			getSOQLExecutor().setAllOption(value);
+			getSOQLExecutor().setAllOption(Boolean.getBoolean(value));
 		} else if(TOOL.equals(key)) {
-			setTool(value);
+			setTool(Boolean.getBoolean(value));
+		} else if(LOCAL.equals(key)) {
+			setLocalize(value);
 		} else {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_008), key);
 			errorMessage = Optional.of(resources.getString(Constants.Message.Error.ERR_011));
@@ -179,7 +182,7 @@ public class DialogProcessor extends AbstractProcessor {
 				occurredError = true;
 				break;
 			}
-			analyzeSetOption(parameters[0], Boolean.valueOf(parameters[1]));
+			analyzeSetOption(parameters[0], parameters[1]);
 			break;
 		default:
 			inQuery = true;

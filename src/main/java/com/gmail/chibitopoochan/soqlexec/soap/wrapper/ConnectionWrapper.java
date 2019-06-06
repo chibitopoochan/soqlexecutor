@@ -92,4 +92,11 @@ public interface ConnectionWrapper {
 	 */
 	public GetUserInfoResultWrapper getUserInfo() throws ConnectionException;
 
+	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#setLocaleOptions(String, boolean)}のラップ
+	 * @param language 言語
+	 * @param localizeErrors
+	 */
+	public void setLocaleOptions(String language, boolean localizeErrors);
+
 }

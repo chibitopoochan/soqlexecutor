@@ -81,6 +81,15 @@ public class PartnerConnectionWrapper implements ConnectionWrapper {
 	}
 
 	/**
+	 * {@link com.sforce.soap.partner.PartnerConnection#setLocaleOptions(String, boolean)}のラップ
+	 * @param language 言語
+	 * @param localizeErrors
+	 */
+	public void setLocaleOptions(String language, boolean localizeErrors) {
+		connection.setLocaleOptions(language, localizeErrors);
+	}
+
+	/**
 	 * {@link com.sforce.soap.partner.PartnerConnection#getQueryOptions()}のラップ
 	 * バッチサイズ取得のため、内部でgetBatchSize()を呼び出している。
 	 * @return 取得件数
