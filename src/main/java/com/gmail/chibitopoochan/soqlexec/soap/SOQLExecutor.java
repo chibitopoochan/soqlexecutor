@@ -41,6 +41,7 @@ public class SOQLExecutor {
 	private boolean all;
 	private boolean join;
 	private int size;
+
 	private Map<String, String> subqueryMap = new HashMap<>();
 	private Pattern selectPattern = Pattern.compile(Constants.SOQL.Pattern.SELECT_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
 	private Pattern labelPattern = Pattern.compile(Constants.SOQL.Pattern.LABEL_FIELDS, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL);
@@ -88,6 +89,10 @@ public class SOQLExecutor {
 		this.all = all;
 	}
 
+	/**
+	 * サブクエリの展開有無
+	 * @param join 展開しないならtrue
+	 */
 	public void setJoinOption(boolean join) {
 		this.join = join;
 	}
@@ -154,8 +159,6 @@ public class SOQLExecutor {
 		soql = replaceToFormat(soql);
 		// 集計項目の置き換え
 		soql = replaceCount(soql);
-		// サブクエリの置き換え
-		soql = replaceSubquery(soql);
 
 		// SELECT文から項目を抽出
 		Matcher selectMatch = selectPattern.matcher(soql);
@@ -168,6 +171,9 @@ public class SOQLExecutor {
 			logger.warn(resources.getString(Constants.Message.Error.ERR_004), soql);
 			throw new IllegalArgumentException(resources.getString(Constants.Message.Error.ERR_004).replace("{}", soql));
 		}
+
+		// サブクエリの置き換え
+		selectField = replaceSubquery(selectField);
 
 		// 項目に分割
 		return Arrays
