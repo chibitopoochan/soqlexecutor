@@ -243,4 +243,12 @@ public class Connector {
 		return userInfoMap;
 	}
 
+	public String getSessionId() {
+		return factory.getSessionId();
+	}
+
+	public String getServerURL() {
+		return factory.getServerUrl();
+	}
+
 }

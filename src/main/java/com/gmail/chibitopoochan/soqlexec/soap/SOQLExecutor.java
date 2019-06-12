@@ -443,6 +443,13 @@ public class SOQLExecutor {
 				.filter(i -> i.toLowerCase().equals(queryName.toLowerCase())) // クエリ名と一致する場合
 				.findFirst(); // 最初に一致したAPI名を返す
 
+		// Typeの場合、大文字小文字を意識するので読み替えを行う
+		if(apiName.isPresent()) {
+			if("type".equals(apiName.get())) {
+				apiName = Optional.of("Type");
+			}
+		}
+
 		logger.debug(resources.getString(Constants.Message.Information.MSG_007), queryName, apiName);
 
 		return apiName;

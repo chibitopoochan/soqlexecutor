@@ -142,6 +142,14 @@ public class SalesforceConnectionFactory {
 		this.connection = wrapper;
 	}
 
+	public String getServerUrl() {
+		return loginResult.getServerUrl();
+	}
+
+	public String getSessionId() {
+		return loginResult.getSessionId();
+	}
+
 	/**
 	 * SalesforceAPIのラッパーを取得.
 	 * 取得時に都度接続を生成
