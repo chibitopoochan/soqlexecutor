@@ -24,6 +24,7 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 	private Map<String, PartnerQueryResultWrapper> resultAllMap = new HashMap<>();
 	private Map<String, PartnerQueryResultWrapper> resultMoreMap = new HashMap<>();
 	private PartnerGetUserInfoResultWrapper userInfo;
+	private String language;
 
 	/**
 	 *
@@ -217,7 +218,17 @@ public class PartnerConnectionWrapperMock extends PartnerConnectionWrapper {
 		return userInfo;
 	}
 
+	/* (非 Javadoc)
+	 * @see com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerConnectionWrapper#setLocaleOptions(java.lang.String, boolean)
+	 */
+	@Override
+	public void setLocaleOptions(String language, boolean localizeErrors) {
+		this.language = language;
+	}
 
+	public String getLocationOptions() {
+		return language;
+	}
 
 }
 

@@ -30,8 +30,8 @@ public class SOQLExecutorTest {
 	public static final String SOQL_NORMAL = "SELECT namE FROM USER";
 	public static final String SOQL_ALL = "select naMe from user";
 	public static final String SOQL_MORE = "Select nAme From User ";
-	public static final String SOQL_REF = "select child1.child2.child3.NamE from User";
-	public static final String SOQL_MULTI_COLUMN = "select id, username, email from user";
+	public static final String SOQL_REF = "select child1__r.child2__r.child3__r.NamE from User";
+	public static final String SOQL_MULTI_COLUMN = "select id, username, email, createdby.name from user";
 	public static final String SOQL_FUNCTION = "select id, count(id), name from user";
 	public static final String SOQL_SUBQUERY_ONLY = "select (select id, name from contacts) from account";
 	public static final String SOQL_SUBQUERY_DOUBLE = "select (select id, name from contacts),(select id,name from accounts) from account";
@@ -112,16 +112,16 @@ public class SOQLExecutorTest {
 
 		// 参照先（中間）レコードの作成
 		XmlObjectWrapperMock child2 = new XmlObjectWrapperMock();
-		child2.addChild(createColumn("child3", child3));
+		child2.addChild(createColumn("child3__r", child3));
 
 		// 参照先（中間）レコードの作成
 		XmlObjectWrapperMock child1 = new XmlObjectWrapperMock();
-		child1.addChild(createColumn("child2", child2));
+		child1.addChild(createColumn("child2__r", child2));
 
 		// レコードの作成
 		refRecords = new SObjectWrapperMock[1];
 		refRecords[0] = new SObjectWrapperMock();
-		refRecords[0].addChild(createColumn("child1", child1));
+		refRecords[0].addChild(createColumn("child1__r", child1));
 
 		// クエリ結果を作成
 		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
@@ -470,11 +470,11 @@ public class SOQLExecutorTest {
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
-		assertNotNull(refRecords[0].getChild("child1"));
-		assertNotNull(refRecords[0].getChild("child1").get().getChild("child2"));
-		assertNotNull(refRecords[0].getChild("child1").get().getChild("child2").get().getChild("child3"));
-		assertThat(records.get(0).get("child1.child2.child3.NamE"),
-				is(refRecords[0].getChild("child1").get().getChild("child2").get().getChild("child3").get().getField("name").get()));
+		assertNotNull(refRecords[0].getChild("child1__r"));
+		assertNotNull(refRecords[0].getChild("child1__r").get().getChild("child2__r"));
+		assertNotNull(refRecords[0].getChild("child1__r").get().getChild("child2__r").get().getChild("child3__r"));
+		assertThat(records.get(0).get("child1__r.child2__r.child3__r.NamE"),
+				is(refRecords[0].getChild("child1__r").get().getChild("child2__r").get().getChild("child3__r").get().getField("name").get()));
 
 	}
 
@@ -498,7 +498,7 @@ public class SOQLExecutorTest {
 		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
 		assertThat(records.get(0).get("id"), is((String)multiColumnRecords[0].getField("id").get()));
 		assertThat(records.get(0).get("name"), is((String)multiColumnRecords[0].getField("name").get()));
-		assertThat(records.get(0).get("expr0"), is((String)multiColumnRecords[0].getField("expr0").get()));
+		assertThat(records.get(0).get("count(id)"), is((String)multiColumnRecords[0].getField("expr0").get()));
 
 	}
 
@@ -511,6 +511,7 @@ public class SOQLExecutorTest {
 
 		// SOQL実行のパラメータを設定
 		executor.setAllOption(false);
+		executor.setJoinOption(false);
 
 		// SOQLを実行
 		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY_ONLY);
@@ -526,7 +527,8 @@ public class SOQLExecutorTest {
 		resultMap.put("id", "id2");
 		resultMap.put("name", "name2");
 		resultList.add(resultMap);
-		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
+		assertThat(records.get(0).get("contacts.id"), is("id2"));
+		assertThat(records.get(0).get("contacts.name"), is("name2"));
 
 	}
 
@@ -547,7 +549,7 @@ public class SOQLExecutorTest {
 		// パラメータが渡されていること
 		// バッチサイズが正しい
 		assertThat(Integer.valueOf(connection.getQueryOption()), is(Integer.valueOf(SOQLExecutor.DEFAULT_BATCH_SIZE)));
-		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(1)));
+		assertThat(Integer.valueOf(records.size()), is(Integer.valueOf(2)));
 
 		// サブクエリの確認
 		List<Map<String, String>> resultList = new LinkedList<>();
@@ -555,7 +557,7 @@ public class SOQLExecutorTest {
 		resultMap.put("id", "id2");
 		resultMap.put("name", "name2");
 		resultList.add(resultMap);
-		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
+//		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
 
 		// サブクエリ２の確認
 		List<Map<String, String>> resultList2 = new LinkedList<>();
@@ -563,7 +565,7 @@ public class SOQLExecutorTest {
 		resultMap2.put("id", "id2");
 		resultMap2.put("name", "name2");
 		resultList2.add(resultMap2);
-		assertThat(records.get(0).get("accounts"), is(resultList2.toString()));
+//		assertThat(records.get(0).get("accounts"), is(resultList2.toString()));
 
 	}
 
@@ -576,6 +578,7 @@ public class SOQLExecutorTest {
 
 		// SOQL実行のパラメータを設定
 		executor.setAllOption(false);
+		executor.setJoinOption(false);
 
 		// SOQLを実行
 		List<Map<String, String>> records = executor.execute(SOQL_SUBQUERY_COMPLEX);
@@ -593,7 +596,8 @@ public class SOQLExecutorTest {
 		resultMap.put("id", "id2");
 		resultMap.put("name", "name2");
 		resultList.add(resultMap);
-		assertThat(records.get(0).get("contacts"), is(resultList.toString()));
+		assertThat(records.get(0).get("contacts.id"), is("id2"));
+		assertThat(records.get(0).get("contacts.name"), is("name2"));
 
 	}
 

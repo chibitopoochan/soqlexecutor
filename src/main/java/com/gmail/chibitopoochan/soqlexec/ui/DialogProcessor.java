@@ -142,11 +142,11 @@ public class DialogProcessor extends AbstractProcessor {
 	 */
 	private void analyzeSetOption(String key, String value) {
 		if(MORE.equals(key)) {
-			setMore(Boolean.getBoolean(value));
+			setMore(Boolean.parseBoolean(value));
 		} else if(ALL.equals(key)) {
-			getSOQLExecutor().setAllOption(Boolean.getBoolean(value));
+			getSOQLExecutor().setAllOption(Boolean.parseBoolean(value));
 		} else if(TOOL.equals(key)) {
-			setTool(Boolean.getBoolean(value));
+			setTool(Boolean.parseBoolean(value));
 		} else if(LOCAL.equals(key)) {
 			setLocalize(value);
 		} else {
