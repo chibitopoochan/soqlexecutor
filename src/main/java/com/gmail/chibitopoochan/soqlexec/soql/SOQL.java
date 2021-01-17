@@ -17,10 +17,10 @@ public class SOQL {
 	private List<SOQLField> selectFieldList = new LinkedList<>();
 	private List<SOQLField> orderByFieldList = new LinkedList<>();
 	private List<SOQLField> groupByFieldList = new LinkedList<>();
-	private String having;
-	private String where;
-	private int limit;
-	private int offset;
+	private String having = "";
+	private String where = "";
+	private int limit = 0;
+	private int offset = 0;
 
 	public void addSelectField(SOQLField field) {
 		this.selectFieldList.add(field);
@@ -59,6 +59,10 @@ public class SOQL {
 		builder.append("SELECT ");
 		builder.append(selectFieldList.stream().map(f -> f.toString()).collect(Collectors.joining(",")));
 		builder.append(" FROM ").append(objectName);
+		if(!where.isEmpty())	builder.append(" WHERE ").append(where);
+		if(!having.isEmpty())	builder.append(" HAVING ").append(having);
+		if(limit != 0)			builder.append(" LIMIT ").append(limit);
+		if(offset != 0)			builder.append(" OFFSET ").append(offset);
 		return builder.toString();
 	}
 

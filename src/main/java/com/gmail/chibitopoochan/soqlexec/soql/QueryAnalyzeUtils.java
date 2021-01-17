@@ -112,6 +112,8 @@ public class QueryAnalyzeUtils {
 
 	private int functionIndex = 0;
 
+	private StringBuilder work = new StringBuilder();
+
 	private QueryAnalyzeUtils(String query) {
 		lexer = new TokenLexer(query);
 		soql = new SOQL();
@@ -293,7 +295,9 @@ public class QueryAnalyzeUtils {
 	 */
 	public void whereCaluse() throws TokenException{
 		check(WHERE);
+		work.setLength(0);
 		searchConditionList();
+		soql.setWhere(work.toString());
 	}
 
 	/**
@@ -426,10 +430,10 @@ public class QueryAnalyzeUtils {
 	public void groupByClause() throws TokenException{
 		check(GROUP);
 		check(BY);
-		valueExpression();
+		soql.addGroupByField(valueExpression());
 		if(nextIs(COMMA)) {
 			check(COMMA);
-			valueExpression();
+			soql.addGroupByField(valueExpression());
 		}
 	}
 
@@ -440,7 +444,9 @@ public class QueryAnalyzeUtils {
 	 */
 	public void havingClause() throws TokenException{
 		check(HAVING);
+		work.setLength(0);
 		searchCondtion();
+		soql.setHaving(work.toString());
 	}
 
 	/**
@@ -452,15 +458,23 @@ public class QueryAnalyzeUtils {
 	public void orderByClause() throws TokenException{
 		check(ORDER);
 		check(BY);
-		valueExpression();
+		SOQLField field;
+
+		field = valueExpression();
+		work.setLength(0);
 		if(nextIs(ASC,DESC)) orderSpecify();
 		if(nextIs(NULLS)) nullsSpecify();
+		field.setExtend(work.toString());
+		soql.addOrderByField(field);
 
 		while(nextIs(COMMA)) {
 			check(COMMA);
-			valueExpression();
+			field = valueExpression();
+			work.setLength(0);
 			if(nextIs(ASC,DESC)) orderSpecify();
 			if(nextIs(NULLS)) nullsSpecify();
+			field.setExtend(work.toString());
+			soql.addOrderByField(field);
 		}
 
 	}
@@ -491,7 +505,9 @@ public class QueryAnalyzeUtils {
 	 */
 	public void limitClause() throws TokenException{
 		check(LIMIT);
+		work.setLength(0);
 		check(DIGIT);
+		soql.setLimit(Integer.valueOf(work.toString()));
 	}
 
 	/**
@@ -501,7 +517,9 @@ public class QueryAnalyzeUtils {
 	 */
 	public void offsetClause() throws TokenException{
 		check(OFFSET);
+		work.setLength(0);
 		check(DIGIT);
+		soql.setOffset(Integer.valueOf(work.toString()));
 	}
 
 	private boolean nextIs(TokenType...expected) {
@@ -518,6 +536,8 @@ public class QueryAnalyzeUtils {
 		if(Stream.of(expected).noneMatch(t -> token.getType() == t)){
 			throw new TokenException(token, Stream.of(expected).map(t -> t.toString()).collect(Collectors.joining(",")));
 		}
+		if(work.length() > 0) work.append(" ");
+		work.append(token.getValue());
 	}
 
 	public class TokenException extends Exception {

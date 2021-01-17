@@ -20,6 +20,9 @@ import com.gmail.chibitopoochan.soqlexec.soap.mock.QueryResultWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.SObjectWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.mock.XmlObjectWrapperMock;
 import com.gmail.chibitopoochan.soqlexec.soap.partner.wrapper.PartnerXmlObjectWrapper;
+import com.gmail.chibitopoochan.soqlexec.soql.QueryAnalyzeUtils;
+import com.gmail.chibitopoochan.soqlexec.soql.QueryAnalyzeUtils.TokenException;
+import com.gmail.chibitopoochan.soqlexec.soql.SOQL;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -28,6 +31,8 @@ import com.sforce.ws.ConnectionException;
 public class SOQLExecutorTest {
 	// 検証に使用するSOQL
 	public static final String SOQL_NORMAL = "SELECT namE FROM USER";
+	public static final String SOQL_NORMAL_CONDITION =
+			"SELECT namE FROM USER where name = 'a;,_()&%$#\"\\'' and name in ('','ABC') group by name order by name desc nulls first limit 921 offset 2000";
 	public static final String SOQL_ALL = "select naMe from user";
 	public static final String SOQL_MORE = "Select nAme From User ";
 	public static final String SOQL_REF = "select child1__r.child2__r.child3__r.NamE from User";
@@ -99,6 +104,26 @@ public class SOQLExecutorTest {
 
 		// Wrapperに設定
 		connection.putSOQL(SOQL_NORMAL, normalResult);
+
+	}
+
+	/**
+	 * 条件付き通常レコードを用意
+	 */
+	private void setNormalConditionRecords() {
+		// レコードの作成
+		normalRecords = new SObjectWrapperMock[1];
+		normalRecords[0] = new SObjectWrapperMock();
+		normalRecords[0].addChild(createColumn("Name", "value"));
+
+		// クエリ結果を作成
+		QueryResultWrapperMock normalResult = new QueryResultWrapperMock();
+		normalResult.setRecords(normalRecords);
+		normalResult.setSize(1);
+		normalResult.setDone(true);
+
+		// Wrapperに設定
+		connection.putSOQL(SOQL_NORMAL_CONDITION, normalResult);
 
 	}
 
@@ -566,6 +591,30 @@ public class SOQLExecutorTest {
 		resultMap2.put("name", "name2");
 		resultList2.add(resultMap2);
 //		assertThat(records.get(0).get("accounts"), is(resultList2.toString()));
+
+	}
+
+	@Test public void testExecSOQLWithCondition() throws ConnectionException, TokenException {
+		// 個別の初期化処理
+		setNormalConditionRecords();
+
+		// 接続設定
+		connection.setSuccess(true);
+
+		// SOQL実行のパラメータを設定
+		executor.setAllOption(false);
+		executor.setJoinOption(false);
+
+		// SOQLを実行
+		executor.execute(SOQL_NORMAL_CONDITION);
+
+		SOQL query = QueryAnalyzeUtils.analyze(SOQL_NORMAL_CONDITION);
+		assertThat(query.getFromObject(), is("USER"));
+		assertThat(query.getGroupByFields().get(0).getLabel(), is("name"));
+		assertThat(query.getOrderByFields().get(0).getLabel(), is("name"));
+		assertThat(query.getOrderByFields().get(0).getExtend(), is("DESC NULLS FIRST"));
+		assertThat(query.getLimit(), is(921));
+		assertThat(query.getOffset(), is(2000));
 
 	}
 

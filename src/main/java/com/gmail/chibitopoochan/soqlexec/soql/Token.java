@@ -5,7 +5,7 @@ public class Token {
 	private String value;
 
 	public Token(TokenType type) {
-		this(type,"");
+		this(type,type.toString());
 	}
 
 	public Token(TokenType type, String value) {

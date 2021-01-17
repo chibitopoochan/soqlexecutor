@@ -7,9 +7,18 @@ public class SOQLField {
 	private Optional<String> label = Optional.empty();
 	private Optional<SOQLField> relation = Optional.empty();
 	private Optional<SOQL> subquery = Optional.empty();
+	private Optional<String> extend = Optional.empty();
 
 	public SOQLField(String name) {
 		this.apiName = name;
+	}
+
+	public String getExtend() {
+		return extend.orElse("");
+	}
+
+	public void setExtend(String e) {
+		extend = Optional.of(e);
 	}
 
 	public void setLabel(String label) {
